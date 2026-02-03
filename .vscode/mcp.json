@@ -1,0 +1,31 @@
+{
+  "servers": {
+    "microsoft/playwright-mcp": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+		"@playwright/mcp@latest", 
+		"--headless"]
+    },
+    "modelcontextprotocol/server-filesystem": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-filesystem",
+        "${workspaceFolder}"
+      ]
+    },
+    "sequential-thinking": {
+	  "type": "stdio",
+      "command": "cmd.exe",
+      "args": [
+        "/R",
+        "npx",
+        "-y",
+        "@modelcontextprotocol/server-sequential-thinking"
+      ],
+    }
+  },
+  "inputs": []
+}

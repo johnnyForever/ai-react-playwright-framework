@@ -1,0 +1,187 @@
+name: Test on Demand
+
+# Manual trigger with customizable inputs
+on:
+  workflow_dispatch:
+    inputs:
+      browser:
+        description: 'Browser to test on'
+        required: true
+        default: 'chromium'
+        type: choice
+        options:
+          - chromium
+          - firefox
+          - webkit
+          - all
+      
+      tags:
+        description: 'Test tags to run'
+        required: true
+        default: '@regression'
+        type: choice
+        options:
+          - '@smoke'
+          - '@regression'
+          - all
+      
+      environment:
+        description: 'Test environment'
+        required: true
+        default: 'local'
+        type: choice
+        options:
+          - local
+          - staging
+          - production
+      
+      retries:
+        description: 'Number of retries for failed tests'
+        required: false
+        default: '1'
+        type: choice
+        options:
+          - '0'
+          - '1'
+          - '2'
+          - '3'
+      
+      debug:
+        description: 'Enable debug mode (traces on all tests)'
+        required: false
+        default: false
+        type: boolean
+
+env:
+  NODE_VERSION: '20'
+  TEST_ENVIRONMENT: ${{ inputs.environment }}
+  TEST_TRIGGER: 'on_demand'
+
+jobs:
+  test:
+    name: Run Tests (${{ inputs.browser }} - ${{ inputs.tags }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+      
+      - name: 📦 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+      
+      - name: 📚 Install dependencies
+        run: npm ci
+      
+      - name: 🎭 Install Playwright browsers
+        run: |
+          if [ "${{ inputs.browser }}" = "all" ]; then
+            npx playwright install --with-deps
+          else
+            npx playwright install --with-deps ${{ inputs.browser }}
+          fi
+      
+      - name: 🏗️ Build application
+        run: npm run build
+      
+      - name: 📁 Create auth directory
+        run: mkdir -p .auth
+      
+      - name: 🔧 Configure test options
+        id: config
+        run: |
+          # Set browser project
+          if [ "${{ inputs.browser }}" = "all" ]; then
+            echo "BROWSER_FLAG=" >> $GITHUB_OUTPUT
+          else
+            echo "BROWSER_FLAG=--project=${{ inputs.browser }}" >> $GITHUB_OUTPUT
+          fi
+          
+          # Set grep flag for tags
+          if [ "${{ inputs.tags }}" = "all" ]; then
+            echo "GREP_FLAG=" >> $GITHUB_OUTPUT
+          else
+            echo "GREP_FLAG=--grep ${{ inputs.tags }}" >> $GITHUB_OUTPUT
+          fi
+          
+          # Set trace mode
+          if [ "${{ inputs.debug }}" = "true" ]; then
+            echo "TRACE_FLAG=--trace on" >> $GITHUB_OUTPUT
+          else
+            echo "TRACE_FLAG=" >> $GITHUB_OUTPUT
+          fi
+      
+      - name: 🧪 Run tests
+        run: |
+          npx playwright test \
+            ${{ steps.config.outputs.BROWSER_FLAG }} \
+            ${{ steps.config.outputs.GREP_FLAG }} \
+            ${{ steps.config.outputs.TRACE_FLAG }} \
+            --retries ${{ inputs.retries }}
+        env:
+          CI: true
+          ENCRYPTION_KEY: ${{ secrets.ENCRYPTION_KEY }}
+          TEST_USER_EMAIL: ${{ secrets.TEST_USER_EMAIL || 'test@example.com' }}
+          TEST_USER_PASSWORD: ${{ secrets.TEST_USER_PASSWORD || 'password123' }}
+          TEST_ADMIN_EMAIL: ${{ secrets.TEST_ADMIN_EMAIL || 'admin@example.com' }}
+          TEST_ADMIN_PASSWORD: ${{ secrets.TEST_ADMIN_PASSWORD || 'admin123' }}
+      
+      - name: 📊 Generate test dashboard
+        if: always()
+        run: npx ts-node tests/scripts/generateDashboard.ts dashboard
+      
+      - name: 📈 Generate Allure report
+        if: always()
+        run: npx allure generate allure-results --clean -o allure-report
+      
+      - name: 📤 Upload Playwright report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: playwright-report-${{ inputs.browser }}-${{ github.run_number }}
+          path: playwright-report/
+          retention-days: 14
+      
+      - name: 📤 Upload Allure report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: allure-report-${{ inputs.browser }}-${{ github.run_number }}
+          path: allure-report/
+          retention-days: 14
+      
+      - name: 📤 Upload test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-results-${{ inputs.browser }}-${{ github.run_number }}
+          path: |
+            test-results/
+            allure-results/
+          retention-days: 14
+      
+      - name: 📈 Upload dashboard
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-dashboard-${{ github.run_number }}
+          path: test-results/dashboard.html
+          retention-days: 14
+      
+      - name: 📋 Test Summary
+        if: always()
+        run: |
+          echo "## 🧪 Test Run Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Setting | Value |" >> $GITHUB_STEP_SUMMARY
+          echo "|---------|-------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Browser | ${{ inputs.browser }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Tags | ${{ inputs.tags }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Environment | ${{ inputs.environment }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Retries | ${{ inputs.retries }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Debug Mode | ${{ inputs.debug }} |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "📊 Check the artifacts for detailed test reports, Allure report, and dashboard." >> $GITHUB_STEP_SUMMARY

@@ -1,0 +1,4 @@
+.dashboard-layout {
+  min-height: 100vh;
+  background-color: var(--color-bg-page);
+}

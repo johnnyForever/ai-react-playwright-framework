@@ -1,0 +1,120 @@
+name: Test on Merge
+
+# Trigger on push to main (after PR merge)
+on:
+  push:
+    branches:
+      - main
+      - master
+
+env:
+  NODE_VERSION: '20'
+  TEST_ENVIRONMENT: 'ci'
+  TEST_TRIGGER: 'pr_merge'
+
+jobs:
+  test:
+    name: Run All Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+      
+      - name: 📦 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+      
+      - name: 📚 Install dependencies
+        run: npm ci
+      
+      - name: 🎭 Install Playwright browsers
+        run: npx playwright install --with-deps
+      
+      - name: 🏗️ Build application
+        run: npm run build
+      
+      - name: 📁 Create auth directory
+        run: mkdir -p .auth
+      
+      - name: 🧪 Run all tests
+        run: npm run test:ci
+        env:
+          CI: true
+          ENCRYPTION_KEY: ${{ secrets.ENCRYPTION_KEY }}
+          TEST_USER_EMAIL: ${{ secrets.TEST_USER_EMAIL || 'test@example.com' }}
+          TEST_USER_PASSWORD: ${{ secrets.TEST_USER_PASSWORD || 'password123' }}
+          TEST_ADMIN_EMAIL: ${{ secrets.TEST_ADMIN_EMAIL || 'admin@example.com' }}
+          TEST_ADMIN_PASSWORD: ${{ secrets.TEST_ADMIN_PASSWORD || 'admin123' }}
+      
+      - name: 📊 Generate test dashboard
+        if: always()
+        run: npx ts-node tests/scripts/generateDashboard.ts dashboard
+      
+      - name: 📈 Generate Allure report
+        if: always()
+        run: npx allure generate allure-results --clean -o allure-report
+      
+      - name: 📤 Upload Playwright report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 30
+      
+      - name: 📤 Upload Allure report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: allure-report
+          path: allure-report/
+          retention-days: 30
+      
+      - name: 📤 Upload test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-results
+          path: |
+            test-results/
+            allure-results/
+          retention-days: 30
+      
+      - name: 📈 Upload dashboard
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-dashboard
+          path: test-results/dashboard.html
+          retention-days: 30
+      
+      - name: 💬 Comment on commit
+        if: failure()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { owner, repo } = context.repo;
+            const sha = context.sha;
+            
+            await github.rest.repos.createCommitComment({
+              owner,
+              repo,
+              commit_sha: sha,
+              body: `❌ **Tests failed on this commit**\n\nView the [test results](${process.env.GITHUB_SERVER_URL}/${owner}/${repo}/actions/runs/${context.runId}) for details.\n\n📊 Download the Allure report from the artifacts for detailed analysis.`
+            });
+
+  notify:
+    name: Notify on Failure
+    runs-on: ubuntu-latest
+    needs: test
+    if: failure()
+    
+    steps:
+      - name: 📧 Send notification
+        run: |
+          echo "Tests failed! Notification would be sent here."
+          echo "You can integrate with Slack, Teams, or email here."
