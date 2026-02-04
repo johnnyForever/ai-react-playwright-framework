@@ -27,7 +27,9 @@
     "test:flaky": "npx tsx tests/scripts/generateDashboard.ts flaky",
     "allure:generate": "allure generate allure-results --clean -o allure-report",
     "allure:open": "allure open allure-report",
-    "allure:serve": "allure serve allure-results"
+    "allure:serve": "allure serve allure-results",
+    "report:allure": "npx serve allure-report -p 4000",
+    "report:dashboard": "npm run test:dashboard"
   },
   "dependencies": {
     "better-sqlite3": "^12.6.2",
@@ -66,6 +68,7 @@
     "globals": "^16.5.0",
     "jsdom": "^28.0.0",
     "playwright": "^1.58.1",
+    "serve": "^14.2.5",
     "tsx": "^4.19.0",
     "typescript": "~5.9.3",
     "typescript-eslint": "^8.46.4",

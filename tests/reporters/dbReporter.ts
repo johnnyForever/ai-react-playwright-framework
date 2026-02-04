@@ -36,13 +36,10 @@ class DbReporter implements Reporter {
     this.startTime = new Date();
 
     try {
-      console.log('📊 DbReporter: Initializing database...');
       this.db = TestDatabase.getInstance(options.dbPath);
-      console.log(`📊 DbReporter: Database initialized at ${this.db.getDbPath()}`);
     } catch (error) {
       this.initError = error as Error;
       console.error('❌ DbReporter: Failed to initialize database:', error);
-      console.error('   Test results will NOT be stored in database.');
     }
   }
 
@@ -85,23 +82,13 @@ class DbReporter implements Reporter {
     if (this.db) {
       try {
         this.db.insertTestRun(testRun);
-        // Verify the run was inserted
-        const verifyRun = this.db.getTestRun(this.runId);
-        if (verifyRun) {
-          console.log(`✓ Test run ${this.runId} created in database`);
-        } else {
-          console.error(`❌ Test run ${this.runId} NOT found after insert!`);
-        }
       } catch (error) {
         console.error(`❌ Failed to insert test run: ${(error as Error).message}`);
         this.initError = error as Error;
       }
     }
 
-    console.log('\n📊 DB Reporter initialized');
-    console.log(`   Run ID: ${this.runId}`);
-    console.log(`   Environment: ${environment}`);
-    console.log(`   Total tests: ${totalTests}\n`);
+    console.log(`\n📊 DB Reporter: Run ${this.runId.slice(0, 8)}... | ${totalTests} tests | ${environment}\n`);
   }
 
   onTestEnd(test: TestCase, result: TestResult): void {
@@ -220,22 +207,12 @@ class DbReporter implements Reporter {
 
     // Handle database operations
     if (this.db) {
-      console.log('\n📁 Results stored in database');
-      console.log(`   Database: ${this.db.getDbPath()}`);
-      console.log(`   View report: npm run test:dashboard\n`);
-
       // Checkpoint and close database to ensure data is flushed for CI
-      // This is critical for the dashboard generator to read the data
       this.db.checkpoint();
-
-      // Verify data was written by querying the count
-      const verifyRuns = this.db.getRecentTestRuns(1);
-      console.log(`✓ Database checkpointed - verified ${verifyRuns.length} run(s) in database`);
-
-      // Close the database to ensure all data is written to disk
-      // This resets the singleton so the next process gets fresh data
       TestDatabase.resetInstance();
-      console.log('✓ Database closed for dashboard generation');
+      
+      console.log('📁 Results stored in database');
+      console.log(`   View report: npm run test:dashboard`);
     } else {
       console.error('❌ Database was not initialized - no results stored!');
       if (this.initError) {
