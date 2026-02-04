@@ -6,7 +6,7 @@ interface SortSelectorProps {
   onChange: (value: SortOption) => void;
 }
 
-export function SortSelector({ value, onChange }: SortSelectorProps): JSX.Element {
+export function SortSelector({ value, onChange }: SortSelectorProps): React.JSX.Element {
   return (
     <div className="sort-selector">
       <label htmlFor="sort" className="sort-selector__label">

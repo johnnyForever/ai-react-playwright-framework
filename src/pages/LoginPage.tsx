@@ -1,7 +1,7 @@
 import { LoginForm } from '@/features/auth';
 import '@/styles/pages.css';
 
-export function LoginPage(): JSX.Element {
+export function LoginPage(): React.JSX.Element {
   return (
     <main className="page">
       <LoginForm title="Login" redirectTo="/dashboard" />

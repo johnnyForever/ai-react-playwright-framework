@@ -507,8 +507,9 @@ function escapeHtml(text: string): string {
     .replace(/'/g, '&#039;');
 }
 
-// CLI runner
-if (require.main === module) {
+// CLI runner (ESM compatible)
+const isMainModule = import.meta.url === `file://${process.argv[1].replace(/\\/g, '/')}`;
+if (isMainModule) {
   console.log('🎨 Generating Test Dashboard...\n');
   generateDashboard();
 }

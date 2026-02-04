@@ -1,6 +1,6 @@
 import { type ReactNode } from 'react';
 import { render, type RenderOptions, type RenderResult } from '@testing-library/react';
-import { BrowserRouter, MemoryRouter, type MemoryRouterProps } from 'react-router-dom';
+import { MemoryRouter, type MemoryRouterProps } from 'react-router-dom';
 import { BasketProvider } from '@/features/basket/BasketContext';
 
 /**
@@ -24,7 +24,7 @@ function createWrapper({
   withRouter = true,
   withBasket = false,
 }: CustomRenderOptions = {}): React.FC<WrapperProps> {
-  return function Wrapper({ children }: WrapperProps): JSX.Element {
+  return function Wrapper({ children }: WrapperProps): React.JSX.Element {
     let content = <>{children}</>;
 
     if (withBasket) {

@@ -3,7 +3,7 @@ import { DashboardHeader, ProductDetail } from '@/features/dashboard';
 import { getProductById } from '@/data/products';
 import '@/styles/dashboard.css';
 
-export function ProductDetailPage(): JSX.Element {
+export function ProductDetailPage(): React.JSX.Element {
   const { id } = useParams<{ id: string }>();
   const product = id ? getProductById(id) : undefined;
 

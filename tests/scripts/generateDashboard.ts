@@ -1,7 +1,7 @@
-#!/usr/bin/env ts-node
+#!/usr/bin/env tsx
 /**
  * CLI Script to generate test dashboard
- * Usage: npx ts-node tests/scripts/generateDashboard.ts
+ * Usage: npx tsx tests/scripts/generateDashboard.ts
  */
 
 import { generateDashboard } from '../reporters/dashboardGenerator';

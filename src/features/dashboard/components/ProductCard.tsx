@@ -7,7 +7,7 @@ interface ProductCardProps {
   product: Product;
 }
 
-export function ProductCard({ product }: ProductCardProps): JSX.Element {
+export function ProductCard({ product }: ProductCardProps): React.JSX.Element {
   const { addToBasket, removeFromBasket, isInBasket } = useBasket();
   const inBasket = isInBasket(product.id);
 
