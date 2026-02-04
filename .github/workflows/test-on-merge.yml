@@ -45,15 +45,20 @@ jobs:
         env:
           CI: true
           ENCRYPTION_KEY: ${{ secrets.ENCRYPTION_KEY }}
-          # Test credentials MUST be set in repository secrets
+          # Test credentials for Playwright tests and API server
           TEST_USER_EMAIL: ${{ secrets.TEST_USER_EMAIL }}
           TEST_USER_PASSWORD: ${{ secrets.TEST_USER_PASSWORD }}
           TEST_ADMIN_EMAIL: ${{ secrets.TEST_ADMIN_EMAIL }}
           TEST_ADMIN_PASSWORD: ${{ secrets.TEST_ADMIN_PASSWORD }}
+          # Frontend credentials (VITE_ prefix for browser access)
+          VITE_USER_EMAIL: ${{ secrets.TEST_USER_EMAIL }}
+          VITE_USER_PASSWORD: ${{ secrets.TEST_USER_PASSWORD }}
+          VITE_ADMIN_EMAIL: ${{ secrets.TEST_ADMIN_EMAIL }}
+          VITE_ADMIN_PASSWORD: ${{ secrets.TEST_ADMIN_PASSWORD }}
       
       - name: 📊 Generate test dashboard
         if: always()
-        run: npx ts-node tests/scripts/generateDashboard.ts dashboard
+        run: npx tsx tests/scripts/generateDashboard.ts dashboard
       
       - name: 📈 Generate Allure report
         if: always()
