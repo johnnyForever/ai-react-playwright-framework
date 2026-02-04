@@ -1,8 +1,9 @@
+import React from 'react';
 import { Link } from 'react-router-dom';
 import { useBasket } from './BasketContext';
 import './BasketIcon.css';
 
-export function BasketIcon(): JSX.Element {
+export function BasketIcon(): React.JSX.Element {
   const { getBasketCount } = useBasket();
   const count = getBasketCount();
 

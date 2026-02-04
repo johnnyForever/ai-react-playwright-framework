@@ -80,18 +80,39 @@ export class TestLogger {
     }
   }
 
+  /**
+   * Log a debug message for detailed troubleshooting
+   * @param message - The debug message to log
+   * @param metadata - Optional additional context data
+   */
   debug(message: string, metadata?: Record<string, unknown>): void {
     this.writeLog(this.formatMessage('debug', message, metadata));
   }
 
+  /**
+   * Log an informational message
+   * @param message - The info message to log
+   * @param metadata - Optional additional context data
+   */
   info(message: string, metadata?: Record<string, unknown>): void {
     this.writeLog(this.formatMessage('info', message, metadata));
   }
 
+  /**
+   * Log a warning message for potential issues
+   * @param message - The warning message to log
+   * @param metadata - Optional additional context data
+   */
   warn(message: string, metadata?: Record<string, unknown>): void {
     this.writeLog(this.formatMessage('warn', message, metadata));
   }
 
+  /**
+   * Log an error message with optional Error object
+   * @param message - The error message to log
+   * @param error - Optional Error object to extract stack trace from
+   * @param metadata - Optional additional context data
+   */
   error(message: string, error?: Error, metadata?: Record<string, unknown>): void {
     const meta = {
       ...metadata,

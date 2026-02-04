@@ -1,5 +1,9 @@
 import { defineConfig, devices } from '@playwright/test';
 import { STORAGE_STATE_PATH } from './tests/auth/constants';
+import dotenv from 'dotenv';
+
+// Load environment variables from .env file
+dotenv.config();
 
 /**
  * Playwright configuration
@@ -51,6 +55,17 @@ export default defineConfig({
     screenshot: 'only-on-failure',
   },
   projects: [
+    // === API TESTS ===
+    // API tests run independently without browser
+    {
+      name: 'api',
+      testDir: './tests/api',
+      testMatch: /\.api\.spec\.ts/,
+      use: {
+        baseURL: 'http://localhost:3001',
+      },
+    },
+
     // === SETUP PROJECT ===
     // Runs first to authenticate and save storage state
     {
@@ -92,15 +107,6 @@ export default defineConfig({
       },
     },
     {
-      name: 'firefox',
-      testIgnore: /login\.spec\.ts/,
-      dependencies: ['setup'],
-      use: { 
-        ...devices['Desktop Firefox'],
-        storageState: STORAGE_STATE_PATH,
-      },
-    },
-    {
       name: 'webkit',
       testIgnore: /login\.spec\.ts/,
       dependencies: ['setup'],
@@ -109,10 +115,30 @@ export default defineConfig({
         storageState: STORAGE_STATE_PATH,
       },
     },
+
+    // === MOBILE TESTS ===
+    // Mobile viewport testing with pre-authenticated state
+    {
+      name: 'mobile-chrome',
+      testIgnore: /login\.spec\.ts/,
+      dependencies: ['setup'],
+      use: { 
+        ...devices['Pixel 7'],
+        storageState: STORAGE_STATE_PATH,
+      },
+    },
   ],
-  webServer: {
-    command: 'npm run dev',
-    url: 'http://localhost:5173',
-    reuseExistingServer: !process.env.CI,
-  },
+  webServer: [
+    {
+      command: 'npm run dev',
+      url: 'http://localhost:5173',
+      reuseExistingServer: !process.env.CI,
+    },
+    {
+      command: 'npm run api:start',
+      url: 'http://localhost:3001/api/health',
+      reuseExistingServer: !process.env.CI,
+      timeout: 10000,
+    },
+  ],
 });

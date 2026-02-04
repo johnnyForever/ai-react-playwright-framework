@@ -1,26 +1,47 @@
 import type { LoginCredentials, LoginResponse, User } from '@/types/auth';
 
-// Mock users database
-const MOCK_USERS: Record<string, { password: string; user: User }> = {
-  'demo@demo.com': {
-    password: 'password123',
+// Load credentials from environment variables (VITE_ prefix for browser access)
+// These MUST be set in .env file - no fallback values for security
+const USER_EMAIL = import.meta.env.VITE_USER_EMAIL || '';
+const USER_PASSWORD = import.meta.env.VITE_USER_PASSWORD || '';
+const ADMIN_EMAIL = import.meta.env.VITE_ADMIN_EMAIL || '';
+const ADMIN_PASSWORD = import.meta.env.VITE_ADMIN_PASSWORD || '';
+
+// Warn if credentials are not configured (only in development)
+if (import.meta.env.DEV && (!USER_EMAIL || !USER_PASSWORD)) {
+  console.warn('⚠️ VITE_USER_EMAIL and VITE_USER_PASSWORD must be set in .env file');
+}
+if (import.meta.env.DEV && (!ADMIN_EMAIL || !ADMIN_PASSWORD)) {
+  console.warn('⚠️ VITE_ADMIN_EMAIL and VITE_ADMIN_PASSWORD must be set in .env file');
+}
+
+// Mock users database - credentials loaded from environment
+const MOCK_USERS: Record<string, { password: string; user: User }> = {};
+
+// Only add users if credentials are configured
+if (USER_EMAIL && USER_PASSWORD) {
+  MOCK_USERS[USER_EMAIL.toLowerCase()] = {
+    password: USER_PASSWORD,
     user: {
       id: '1',
-      email: 'demo@demo.com',
+      email: USER_EMAIL,
       name: 'Demo User',
       role: 'user',
     },
-  },
-  'admin@demo.com': {
-    password: 'admin123',
+  };
+}
+
+if (ADMIN_EMAIL && ADMIN_PASSWORD) {
+  MOCK_USERS[ADMIN_EMAIL.toLowerCase()] = {
+    password: ADMIN_PASSWORD,
     user: {
       id: '2',
-      email: 'admin@demo.com',
+      email: ADMIN_EMAIL,
       name: 'Admin User',
       role: 'admin',
     },
-  },
-};
+  };
+}
 
 const AUTH_STORAGE_KEY = 'auth_user';
 const SESSION_DURATION_KEY = 'auth_session_duration';

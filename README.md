@@ -21,7 +21,10 @@ npm run test:smoke
 ## Tech Stack
 
 - **Frontend**: React 19 + TypeScript + Vite
+- **API Server**: Express.js + JWT Authentication
+- **Unit Testing**: Vitest + React Testing Library
 - **E2E Testing**: Playwright with Page Object Model
+- **API Testing**: Playwright API testing with performance metrics
 - **Linting**: Biome + ESLint (dual approach)
 - **CI/CD**: GitHub Actions
 
@@ -56,6 +59,14 @@ npx eslint .      # Run ESLint
 
 See [docs/TESTING.md](docs/TESTING.md) for comprehensive testing documentation.
 
+### Unit Tests
+```bash
+npm run test            # Run unit tests in watch mode
+npm run test -- --run   # Run unit tests once
+npm run test:ui         # Run with visual UI
+```
+
+### E2E Tests
 ```bash
 npm run test:e2e        # Run all E2E tests
 npm run test:smoke      # Run critical path tests
@@ -63,19 +74,34 @@ npm run test:regression # Run full test suite
 npm run test:dashboard  # Generate analytics dashboard
 ```
 
+### API Tests
+```bash
+npm run api:start       # Start API server standalone
+npm run test:api        # Run all API tests (40 tests)
+npm run test:api:perf   # Run API performance tests only
+```
+
 ## Project Structure
 
 ```
+api/                    # Express.js API server
+└── server.ts           # REST API with JWT auth
+
 src/                    # React application source
-├── features/           # Feature-based components
+├── features/           # Feature-based components (with unit tests)
+├── components/         # Shared components (with unit tests)
 ├── pages/              # Page components
-├── context/            # React Context providers
+├── services/           # Business logic (with unit tests)
+├── lib/                # Utility functions (with unit tests)
+├── test/               # Unit test utilities
 └── router/             # React Router configuration
 
 tests/                  # Playwright test framework
-├── e2e/                # Test specifications
+├── api/                # API test specifications
+├── e2e/                # E2E test specifications
 ├── pages/              # Page Object Models
 ├── fixtures/           # Test fixtures & data
+├── utils/              # Test utilities (including API helpers)
 ├── db/                 # SQLite test analytics
 └── reporters/          # Custom reporters
 ```

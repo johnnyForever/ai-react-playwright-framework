@@ -6,17 +6,39 @@
 
 import { randomUUID } from 'crypto';
 
-// Helper to generate random strings
+/**
+ * Generates a random alphanumeric string
+ * @param length - The desired length of the string (default: 8)
+ * @returns A random string containing lowercase letters and numbers
+ * @example
+ * randomString() // => "k9f2m7xs"
+ * randomString(12) // => "a3b8c9d2e5f1"
+ */
 function randomString(length: number = 8): string {
   return Math.random().toString(36).substring(2, 2 + length);
 }
 
-// Helper to generate random number in range
+/**
+ * Generates a random integer within a specified range (inclusive)
+ * @param min - The minimum value (inclusive)
+ * @param max - The maximum value (inclusive)
+ * @returns A random integer between min and max
+ * @example
+ * randomNumber(1, 10) // => 7
+ * randomNumber(100, 999) // => 542
+ */
 function randomNumber(min: number, max: number): number {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-// Helper to generate random email
+/**
+ * Generates a random email address
+ * @param domain - The email domain to use (default: 'test.com')
+ * @returns A unique random email address
+ * @example
+ * randomEmail() // => "user_k9f2m7@test.com"
+ * randomEmail('example.org') // => "user_a3b8c9@example.org"
+ */
 function randomEmail(domain: string = 'test.com'): string {
   return `user_${randomString(6)}@${domain}`;
 }
@@ -27,19 +49,21 @@ function randomEmail(domain: string = 'test.com'): string {
 export const UserFactory = {
   /**
    * Get valid user credentials from environment
+   * Credentials MUST be set in .env file
    */
   validUser: () => ({
-    email: process.env.TEST_USER_EMAIL || 'demo@demo.com',
-    password: process.env.TEST_USER_PASSWORD || 'password123',
+    email: process.env.TEST_USER_EMAIL || '',
+    password: process.env.TEST_USER_PASSWORD || '',
     name: 'Demo User',
   }),
 
   /**
    * Get admin user credentials from environment
+   * Credentials MUST be set in .env file
    */
   validAdmin: () => ({
-    email: process.env.TEST_ADMIN_EMAIL || 'admin@demo.com',
-    password: process.env.TEST_ADMIN_PASSWORD || 'admin123',
+    email: process.env.TEST_ADMIN_EMAIL || '',
+    password: process.env.TEST_ADMIN_PASSWORD || '',
     name: 'Admin User',
   }),
 

@@ -1,9 +1,14 @@
 /**
  * Test Credentials
- * Encrypted credentials for test users
+ * Loads credentials from environment variables
  * 
- * To encrypt new credentials, use:
- *   npx ts-node -e "import { encrypt } from './tests/utils/crypto'; console.log(encrypt('your-password'))"
+ * Required environment variables:
+ *   TEST_USER_EMAIL - Standard user email
+ *   TEST_USER_PASSWORD - Standard user password
+ *   TEST_ADMIN_EMAIL - Admin user email  
+ *   TEST_ADMIN_PASSWORD - Admin user password
+ * 
+ * For encrypted credentials, you can also use ENCRYPTION_KEY with encrypted values
  */
 
 import { decrypt } from '../utils/crypto';
@@ -14,22 +19,32 @@ interface UserCredentials {
   role: 'admin' | 'user' | 'guest';
 }
 
+// Load credentials from environment variables
+const USER_EMAIL = process.env.TEST_USER_EMAIL || '';
+const USER_PASSWORD = process.env.TEST_USER_PASSWORD || '';
+const ADMIN_EMAIL = process.env.TEST_ADMIN_EMAIL || '';
+const ADMIN_PASSWORD = process.env.TEST_ADMIN_PASSWORD || '';
+
+// Warn if environment variables are not set
+if (!USER_EMAIL || !USER_PASSWORD) {
+  console.warn('⚠️ TEST_USER_EMAIL and TEST_USER_PASSWORD environment variables are not set');
+}
+if (!ADMIN_EMAIL || !ADMIN_PASSWORD) {
+  console.warn('⚠️ TEST_ADMIN_EMAIL and TEST_ADMIN_PASSWORD environment variables are not set');
+}
+
 /**
- * Encrypted user credentials
- * Passwords are encrypted using AES-256-GCM
- * 
- * These are encrypted versions of the test passwords.
- * The encryption key is stored in ENCRYPTION_KEY environment variable.
+ * User credentials configuration
+ * Passwords can be encrypted using AES-256-GCM when ENCRYPTION_KEY is set
  */
-const ENCRYPTED_USERS: Record<string, { username: string; encryptedPassword: string; role: UserCredentials['role'] }> = {
+const USERS: Record<string, { username: string; encryptedPassword: string; role: UserCredentials['role'] }> = {
   standard: {
-    username: 'demo@demo.com',
-    // Encrypted version of 'password123'
-    encryptedPassword: '', // Will be set dynamically for dev, or use real encrypted value
+    username: USER_EMAIL,
+    encryptedPassword: '', // Set for encrypted mode, empty for plain env vars
     role: 'user',
   },
   admin: {
-    username: 'admin@demo.com',
+    username: ADMIN_EMAIL,
     encryptedPassword: '',
     role: 'admin',
   },
@@ -40,20 +55,19 @@ const ENCRYPTED_USERS: Record<string, { username: string; encryptedPassword: str
   },
 };
 
-// Development passwords (used when ENCRYPTION_KEY is not set)
-// These match the mock users in src/services/authService.ts
-const DEV_PASSWORDS: Record<string, string> = {
-  standard: 'password123',
-  admin: 'admin123',
+// Passwords loaded from environment variables
+const ENV_PASSWORDS: Record<string, string> = {
+  standard: USER_PASSWORD,
+  admin: ADMIN_PASSWORD,
   invalid: 'wrongpassword',
 };
 
 /**
  * Get decrypted credentials for a user type
- * Falls back to development passwords if encryption is not configured
+ * Uses environment variables or falls back to encrypted passwords if configured
  */
 export function getCredentials(userType: 'standard' | 'admin' | 'invalid' = 'standard'): UserCredentials {
-  const user = ENCRYPTED_USERS[userType];
+  const user = USERS[userType];
   
   if (!user) {
     throw new Error(`Unknown user type: ${userType}`);
@@ -66,12 +80,12 @@ export function getCredentials(userType: 'standard' | 'admin' | 'invalid' = 'sta
     try {
       password = decrypt(user.encryptedPassword);
     } catch {
-      console.warn(`Failed to decrypt password for ${userType}, using dev password`);
-      password = DEV_PASSWORDS[userType];
+      console.warn(`Failed to decrypt password for ${userType}, using env password`);
+      password = ENV_PASSWORDS[userType];
     }
   } else {
-    // Development mode - use plain passwords
-    password = DEV_PASSWORDS[userType];
+    // Use passwords from environment variables
+    password = ENV_PASSWORDS[userType];
   }
   
   return {
@@ -85,7 +99,7 @@ export function getCredentials(userType: 'standard' | 'admin' | 'invalid' = 'sta
  * Get all available user types
  */
 export function getAvailableUsers(): string[] {
-  return Object.keys(ENCRYPTED_USERS);
+  return Object.keys(USERS);
 }
 
 /**

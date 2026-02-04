@@ -45,10 +45,11 @@ jobs:
         env:
           CI: true
           ENCRYPTION_KEY: ${{ secrets.ENCRYPTION_KEY }}
-          TEST_USER_EMAIL: ${{ secrets.TEST_USER_EMAIL || 'test@example.com' }}
-          TEST_USER_PASSWORD: ${{ secrets.TEST_USER_PASSWORD || 'password123' }}
-          TEST_ADMIN_EMAIL: ${{ secrets.TEST_ADMIN_EMAIL || 'admin@example.com' }}
-          TEST_ADMIN_PASSWORD: ${{ secrets.TEST_ADMIN_PASSWORD || 'admin123' }}
+          # Test credentials MUST be set in repository secrets
+          TEST_USER_EMAIL: ${{ secrets.TEST_USER_EMAIL }}
+          TEST_USER_PASSWORD: ${{ secrets.TEST_USER_PASSWORD }}
+          TEST_ADMIN_EMAIL: ${{ secrets.TEST_ADMIN_EMAIL }}
+          TEST_ADMIN_PASSWORD: ${{ secrets.TEST_ADMIN_PASSWORD }}
       
       - name: 📊 Generate test dashboard
         if: always()

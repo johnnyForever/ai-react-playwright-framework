@@ -24,7 +24,7 @@ The goal is to demonstrate:
 These rules are **implemented from the start**:
 
 * React + TypeScript setup
-* Feature*based frontend structure
+* Feature-based frontend structure
 * Playwright with Page Object Model
 * Stable locator strategy
 * Basic logging & reporting
@@ -35,7 +35,7 @@ Added progressively to show evolution:
 
 * Storage state authentication
 * Network & performance monitoring
-* Database*backed test results
+* Database backed test results
 * CI/CD reporting
 
 ---
@@ -51,16 +51,24 @@ Added progressively to show evolution:
 * Styling: **CSS3 (component*scoped)**
 * Unit Testing: **Vitest**
 
-### 1.2 Testing
+### 1.2 API Server
+
+* Framework: **Express.js**
+* Authentication: **JWT (jsonwebtoken)**
+* Language: **TypeScript**
+
+### 1.3 Testing
 
 * Test Framework: **Playwright Test**
 * Language: **TypeScript**
 * Pattern: **Page Object Model (POM)**
+* API Testing: **Playwright APIRequestContext with custom helpers**
+* Performance Testing: **Response time metrics (p50, p95, p99)**
 * Assertion Library: **Playwright expect**
 * Reporting: **HTML + JUnit + Allure**
 * CI/CD: **YAML*based pipeline**
 
-### 1.3 Tooling
+### 1.4 Tooling
 
 * Linting & Formatting: **Biome**
 * Environment Management: **dotenv**
@@ -84,17 +92,25 @@ src/
 ├── router            # route definitions
 ├── types             # shared TypeScript types
 ├── styles            # global styles
-└── lib                # helpers & utilities
+└── lib               # helpers & utilities
 ```
 
-### 2.2 Test Structure
+### 2.2 API Server Structure
+
+```text
+api/
+└── server.ts          # Express REST API with JWT auth
+```
+
+### 2.3 Test Structure
 
 ```text
 tests/
+├── api                # API test specs (40 tests)
 ├── pages              # Playwright POMs
-├── fixtures           # test setup & data
-├── utils              # helpers
-└── e2e                # test specs
+├── fixtures           # test setup & data (including api.fixture.ts)
+├── utils              # helpers (including apiHelpers.ts)
+└── e2e                # E2E test specs
 ```
 
 ---
@@ -121,7 +137,7 @@ Tests:
 ### 4.1 Locator Priority (Highest → Lowest)
 
 * getByRole
-* data*testid
+* data-testid
 * getByLabel
 * getByPlaceholder
 * CSS selectors
@@ -131,7 +147,7 @@ Rules:
 
 * XPath requires a justification comment
 * Avoid brittle selectors (indexes, dynamic classes)
-* Prefer accessibility*first locators
+* Prefer accessibility first locators
 
 ---
 
@@ -160,11 +176,37 @@ Rules:
 
 ---
 
-## 7. Logging & Debugging (Mandatory)
+## 7. API Testing (Mandatory)
+
+### 7.1 Principles
+
+* Use Playwright's `APIRequestContext` for API testing
+* Track response times for all requests
+* Assert performance thresholds
+
+### 7.2 Performance Metrics
+
+* Track p50, p95, p99 response times
+* Define thresholds per endpoint type:
+  * Health check: < 50ms
+  * Read operations: < 200ms
+  * Write operations: < 300ms
+  * Auth operations: < 300ms
+
+### 7.3 Test Categories
+
+* `@api` - All API tests
+* `@smoke` - Critical path API tests
+* `@performance` - Performance focused tests
+* `@stress` - Load and stress tests
+
+---
+
+## 8. Logging & Debugging (Mandatory)
 
 ### What Is Logged
 
-* High*level UI actions
+* High-level UI actions
 * Test start / end
 * Errors with stack traces
 * Screenshots on UI failures
@@ -177,7 +219,7 @@ Rules:
 
 ---
 
-## 8. Assertions & Error Handling
+## 9. Assertions & Error Handling
 
 * Use Playwright `expect`
 * One logical assertion per check
@@ -190,7 +232,7 @@ On failure:
 
 ---
 
-## 9. Coding Standards
+## 10. Coding Standards
 
 ### Naming
 
@@ -209,28 +251,29 @@ On failure:
 
 ---
 
-## 10. Reports & Artifacts
+## 11. Reports & Artifacts
 
 * HTML report generated per run
 * Reports are not committed
 * Stored per execution
 * JUnit & Allure for CI integration
+* API performance reports with metrics
 
 ---
 
-## 11. CI/CD
+## 12. CI/CD
 
 Pipeline steps:
 
 1. Install dependencies
 2. Run static analysis
-3. Execute tests
+3. Execute tests (unit, API, E2E)
 4. Publish reports
 5. Archive logs
 
 ---
 
-## 12. AI Usage Rules (Copilot / Amazon Q)
+## 13. AI Usage Rules (Copilot / Amazon Q)
 
 AIgenerated code must:
 
@@ -240,7 +283,7 @@ AIgenerated code must:
 * Avoid hacks or shortcuts
 * Optimize for clarity and maintainability
 
-### 12.1 AI Tooling
+### 13.1 AI Tooling
 
 This project uses MCP servers to provide AI with structured access to:
 
@@ -249,11 +292,11 @@ This project uses MCP servers to provide AI with structured access to:
 * (Optional) Git history and diffs
 
 AI is used as a coding assistant, not an autonomous agent.
-All architectural decisions remain human*driven.
+All architectural decisions remain human-driven.
 
 ---
 
-## 13. Documentation
+## 14. Documentation
 
 * README.md with setup & execution steps
 * docs/ folder for design decisions
