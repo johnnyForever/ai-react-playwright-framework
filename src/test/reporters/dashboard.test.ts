@@ -6,7 +6,7 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { DashboardUtils } from '../../../tests/reporters/dashboard/DashboardUtils';
 import { HtmlTemplateEngine } from '../../../tests/reporters/dashboard/HtmlTemplateEngine';
-import { DashboardData, DashboardStats, TestRun, TestResult, TestHistory } from '../../../tests/reporters/dashboard/types';
+import type { DashboardData, DashboardStats, TestRun, TestResult, TestHistory } from '../../../tests/reporters/dashboard/types';
 
 describe('DashboardUtils', () => {
   describe('formatDuration', () => {
@@ -148,11 +148,13 @@ describe('HtmlTemplateEngine', () => {
       totalRuns: 20,
       passCount: 15,
       failCount: 5,
+      skipCount: 0,
+      flakyCount: 5,
       avgDurationMs: 3000,
       minDurationMs: 1000,
       maxDurationMs: 5000,
       flakinessScore: 25,
-      lastRun: '2026-02-04T10:00:00Z',
+      lastRunAt: '2026-02-04T10:00:00Z',
       lastStatus: 'passed',
     };
 
@@ -163,11 +165,13 @@ describe('HtmlTemplateEngine', () => {
       totalRuns: 10,
       passCount: 10,
       failCount: 0,
+      skipCount: 0,
+      flakyCount: 0,
       avgDurationMs: 15000,
       minDurationMs: 12000,
       maxDurationMs: 20000,
       flakinessScore: 0,
-      lastRun: '2026-02-04T10:00:00Z',
+      lastRunAt: '2026-02-04T10:00:00Z',
       lastStatus: 'passed',
     };
 

@@ -3,7 +3,7 @@
  * Generates HTML components for the test dashboard
  */
 
-import { DashboardData, ChartData, TestRun, TestResult, TestHistory } from './types';
+import type { DashboardData, ChartData, TestRun, TestResult, TestHistory } from './types';
 import { DashboardUtils } from './DashboardUtils';
 
 /**
