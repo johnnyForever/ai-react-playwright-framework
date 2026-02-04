@@ -5,12 +5,12 @@
 
 import type {
   FullConfig,
-  FullResult,
   Reporter,
   Suite,
   TestCase,
   TestResult,
 } from '@playwright/test/reporter';
+import { execSync } from 'child_process';
 import { v4 as uuidv4 } from 'uuid';
 import { TestDatabase, TestRun, TestResult as DbTestResult } from '../db/database';
 
@@ -21,18 +21,28 @@ interface DbReporterOptions {
 }
 
 class DbReporter implements Reporter {
-  private db: TestDatabase;
+  private db: TestDatabase | null = null;
   private runId: string;
   private startTime: Date;
   private results: DbTestResult[] = [];
   private config?: FullConfig;
   private options: DbReporterOptions;
+  private initError: Error | null = null;
 
   constructor(options: DbReporterOptions = {}) {
     this.options = options;
     this.runId = uuidv4();
     this.startTime = new Date();
-    this.db = TestDatabase.getInstance(options.dbPath);
+    
+    try {
+      console.log('📊 DbReporter: Initializing database...');
+      this.db = TestDatabase.getInstance(options.dbPath);
+      console.log(`📊 DbReporter: Database initialized at ${this.db.getDbPath()}`);
+    } catch (error) {
+      this.initError = error as Error;
+      console.error('❌ DbReporter: Failed to initialize database:', error);
+      console.error('   Test results will NOT be stored in database.');
+    }
   }
 
   onBegin(config: FullConfig, suite: Suite): void {
@@ -71,7 +81,9 @@ class DbReporter implements Reporter {
       browser: browsers
     };
 
-    this.db.insertTestRun(testRun);
+    if (this.db) {
+      this.db.insertTestRun(testRun);
+    }
     
     console.log('\n📊 DB Reporter initialized');
     console.log(`   Run ID: ${this.runId}`);
@@ -99,8 +111,10 @@ class DbReporter implements Reporter {
     };
 
     this.results.push(testResult);
-    this.db.insertTestResult(testResult);
-    this.db.updateTestHistory(testResult);
+    if (this.db) {
+      this.db.insertTestResult(testResult);
+      this.db.updateTestHistory(testResult);
+    }
 
     // Log progress
     const statusIcon = {
@@ -122,7 +136,7 @@ class DbReporter implements Reporter {
     console.log(`${statusColor}${statusIcon}\x1b[0m ${test.title} (${result.duration}ms)`);
   }
 
-  async onEnd(result: FullResult): Promise<void> {
+  async onEnd(): Promise<void> {
     const endTime = new Date();
     const duration = endTime.getTime() - this.startTime.getTime();
     
@@ -135,16 +149,18 @@ class DbReporter implements Reporter {
     const passRate = total > 0 ? (passed / total) * 100 : 0;
 
     // Update test run with final stats
-    this.db.updateTestRun(this.runId, {
-      finishedAt: endTime.toISOString(),
-      totalTests: total,
-      passed,
-      failed,
-      skipped,
-      flaky,
-      passRate,
-      durationMs: duration
-    });
+    if (this.db) {
+      this.db.updateTestRun(this.runId, {
+        finishedAt: endTime.toISOString(),
+        totalTests: total,
+        passed,
+        failed,
+        skipped,
+        flaky,
+        passRate,
+        durationMs: duration
+      });
+    }
 
     // Print summary
     console.log('\n' + '═'.repeat(60));
@@ -182,21 +198,29 @@ class DbReporter implements Reporter {
     }
 
     console.log('\n📁 Results stored in database');
-    console.log(`   Database: ${this.db.getDbPath()}`);
+    console.log(`   Database: ${this.db?.getDbPath() || 'NOT INITIALIZED'}`);
     console.log(`   View report: npm run test:dashboard\n`);
 
-    // Checkpoint and close database to ensure data is flushed for CI
-    // This is critical for the dashboard generator to read the data
-    this.db.checkpoint();
-    
-    // Verify data was written by querying the count
-    const verifyRuns = this.db.getRecentTestRuns(1);
-    console.log(`✓ Database checkpointed - verified ${verifyRuns.length} run(s) in database`);
-    
-    // Close the database to ensure all data is written to disk
-    // This resets the singleton so the next process gets fresh data
-    TestDatabase.resetInstance();
-    console.log('✓ Database closed for dashboard generation');
+    // Only checkpoint and close if database was initialized
+    if (this.db) {
+      // Checkpoint and close database to ensure data is flushed for CI
+      // This is critical for the dashboard generator to read the data
+      this.db.checkpoint();
+      
+      // Verify data was written by querying the count
+      const verifyRuns = this.db.getRecentTestRuns(1);
+      console.log(`✓ Database checkpointed - verified ${verifyRuns.length} run(s) in database`);
+      
+      // Close the database to ensure all data is written to disk
+      // This resets the singleton so the next process gets fresh data
+      TestDatabase.resetInstance();
+      console.log('✓ Database closed for dashboard generation');
+    } else {
+      console.error('❌ Database was not initialized - no results stored!');
+      if (this.initError) {
+        console.error(`   Error: ${this.initError.message}`);
+      }
+    }
   }
 
   private countTests(suite: Suite): number {
@@ -217,7 +241,6 @@ class DbReporter implements Reporter {
 
   private getGitBranch(): string | undefined {
     try {
-      const { execSync } = require('child_process');
       return execSync('git rev-parse --abbrev-ref HEAD', { encoding: 'utf-8' }).trim();
     } catch {
       return undefined;
@@ -226,7 +249,6 @@ class DbReporter implements Reporter {
 
   private getGitCommit(): string | undefined {
     try {
-      const { execSync } = require('child_process');
       return execSync('git rev-parse --short HEAD', { encoding: 'utf-8' }).trim();
     } catch {
       return undefined;
