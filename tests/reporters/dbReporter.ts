@@ -33,7 +33,7 @@ class DbReporter implements Reporter {
     this.options = options;
     this.runId = uuidv4();
     this.startTime = new Date();
-    
+
     try {
       console.log('📊 DbReporter: Initializing database...');
       this.db = TestDatabase.getInstance(options.dbPath);
@@ -47,18 +47,18 @@ class DbReporter implements Reporter {
 
   onBegin(config: FullConfig, suite: Suite): void {
     this.config = config;
-    
+
     // Get git info if available
     const branch = process.env.GITHUB_REF_NAME || process.env.GIT_BRANCH || this.getGitBranch();
     const commitSha = process.env.GITHUB_SHA || process.env.GIT_COMMIT || this.getGitCommit();
-    
+
     // Count total tests
     const totalTests = this.countTests(suite);
-    
+
     // Determine environment and trigger
     const environment = this.options.environment || process.env.TEST_ENVIRONMENT || 'local';
     const trigger = this.options.trigger || process.env.TEST_TRIGGER || 'manual';
-    
+
     // Get browser and tags from config
     const browsers = config.projects.map(p => p.name).join(',');
     const grepTag = config.grep?.toString() || '';
@@ -84,7 +84,7 @@ class DbReporter implements Reporter {
     if (this.db) {
       this.db.insertTestRun(testRun);
     }
-    
+
     console.log('\n📊 DB Reporter initialized');
     console.log(`   Run ID: ${this.runId}`);
     console.log(`   Environment: ${environment}`);
@@ -139,7 +139,7 @@ class DbReporter implements Reporter {
   async onEnd(): Promise<void> {
     const endTime = new Date();
     const duration = endTime.getTime() - this.startTime.getTime();
-    
+
     // Calculate summary
     const passed = this.results.filter(r => r.status === 'passed').length;
     const failed = this.results.filter(r => r.status === 'failed').length;
@@ -197,20 +197,20 @@ class DbReporter implements Reporter {
       });
     }
 
-    console.log('\n📁 Results stored in database');
-    console.log(`   Database: ${this.db?.getDbPath() || 'NOT INITIALIZED'}`);
-    console.log(`   View report: npm run test:dashboard\n`);
-
-    // Only checkpoint and close if database was initialized
+    // Handle database operations
     if (this.db) {
+      console.log('\n📁 Results stored in database');
+      console.log(`   Database: ${this.db.getDbPath()}`);
+      console.log(`   View report: npm run test:dashboard\n`);
+
       // Checkpoint and close database to ensure data is flushed for CI
       // This is critical for the dashboard generator to read the data
       this.db.checkpoint();
-      
+
       // Verify data was written by querying the count
       const verifyRuns = this.db.getRecentTestRuns(1);
       console.log(`✓ Database checkpointed - verified ${verifyRuns.length} run(s) in database`);
-      
+
       // Close the database to ensure all data is written to disk
       // This resets the singleton so the next process gets fresh data
       TestDatabase.resetInstance();
