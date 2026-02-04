@@ -24,6 +24,9 @@ interface DashboardData {
 export function generateDashboard(dbPath?: string, outputPath?: string): void {
   const db = TestDatabase.getInstance(dbPath);
   
+  // Debug: Log database path and check for data
+  console.log(`📂 Database path: ${db.getDbPath()}`);
+  
   const data: DashboardData = {
     runs: db.getRecentTestRuns(20),
     stats: db.getOverallStats(),
@@ -33,9 +36,19 @@ export function generateDashboard(dbPath?: string, outputPath?: string): void {
     latestFailures: []
   };
 
+  // Debug: Log data found
+  console.log(`📊 Found ${data.runs.length} test runs in database`);
+  console.log(`📊 Overall stats: ${data.stats.totalTests} total tests, ${data.stats.avgPassRate.toFixed(1)}% avg pass rate`);
+
+  if (data.runs.length === 0) {
+    console.warn('⚠️  No test runs found in database. Dashboard will be empty.');
+    console.warn('   Make sure tests were run with the dbReporter enabled.');
+  }
+
   // Get failures from latest run
   if (data.runs.length > 0) {
     data.latestFailures = db.getFailedTests(data.runs[0].runId);
+    console.log(`📊 Latest run: ${data.runs[0].runId} - ${data.runs[0].passed} passed, ${data.runs[0].failed} failed`);
   }
 
   const html = generateHtml(data);

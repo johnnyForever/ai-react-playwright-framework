@@ -318,7 +318,17 @@ export class TestDatabase {
   // Utility Methods
   // ===========================================================================
 
+  /**
+   * Checkpoint WAL to ensure all data is written to the main database file.
+   * This is important for CI where another process reads the database.
+   */
+  checkpoint(): void {
+    this.db.pragma('wal_checkpoint(TRUNCATE)');
+  }
+
   close(): void {
+    // Checkpoint WAL before closing to ensure all data is in main DB file
+    this.checkpoint();
     this.db.close();
   }
 

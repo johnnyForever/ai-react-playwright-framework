@@ -56,13 +56,36 @@ jobs:
           VITE_ADMIN_EMAIL: ${{ secrets.TEST_ADMIN_EMAIL }}
           VITE_ADMIN_PASSWORD: ${{ secrets.TEST_ADMIN_PASSWORD }}
       
+      - name: � Debug - List test artifacts
+        if: always()
+        run: |
+          echo "=== Allure Results ==="
+          ls -la allure-results/ 2>/dev/null | head -20 || echo "allure-results folder not found"
+          echo ""
+          echo "=== Test Results ==="
+          ls -la test-results/ 2>/dev/null || echo "test-results folder not found"
+          echo ""
+          echo "=== Database file check ==="
+          if [ -f "test-results/test-analytics.db" ]; then
+            echo "Database exists: $(ls -la test-results/test-analytics.db)"
+            echo "Database size: $(du -h test-results/test-analytics.db)"
+          else
+            echo "Database file not found!"
+          fi
+
       - name: 📊 Generate test dashboard
         if: always()
         run: npx tsx tests/scripts/generateDashboard.ts dashboard
       
       - name: 📈 Generate Allure report
         if: always()
-        run: npx allure generate allure-results --clean -o allure-report
+        run: |
+          echo "Installing Allure CLI..."
+          npm install -g allure-commandline --save-dev 2>/dev/null || true
+          echo "Generating Allure report..."
+          npx allure generate allure-results --clean -o allure-report || echo "Allure generation failed"
+          echo "=== Allure Report Generated ==="
+          ls -la allure-report/ 2>/dev/null | head -10 || echo "allure-report folder not created"
       
       - name: 📤 Upload Playwright report
         uses: actions/upload-artifact@v4

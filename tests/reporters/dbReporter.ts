@@ -183,6 +183,11 @@ class DbReporter implements Reporter {
 
     console.log('\n📁 Results stored in database');
     console.log(`   View report: npm run test:dashboard\n`);
+
+    // Checkpoint and close database to ensure data is flushed for CI
+    // This is critical for the dashboard generator to read the data
+    this.db.checkpoint();
+    console.log('✓ Database checkpointed for dashboard generation');
   }
 
   private countTests(suite: Suite): number {
