@@ -22,10 +22,23 @@ interface DashboardData {
 }
 
 export function generateDashboard(dbPath?: string, outputPath?: string): void {
+  // Determine the database path
+  const expectedDbPath = dbPath || path.join(process.cwd(), 'test-results', 'test-analytics.db');
+  
+  // Debug: Check if database file exists before opening
+  console.log(`📂 Expected database path: ${expectedDbPath}`);
+  if (fs.existsSync(expectedDbPath)) {
+    const stats = fs.statSync(expectedDbPath);
+    console.log(`📂 Database file exists: ${stats.size} bytes`);
+  } else {
+    console.warn('⚠️  Database file does not exist!');
+    console.warn('   Tests may not have run or dbReporter may not be configured.');
+  }
+  
   const db = TestDatabase.getInstance(dbPath);
   
-  // Debug: Log database path and check for data
-  console.log(`📂 Database path: ${db.getDbPath()}`);
+  // Debug: Log actual database path
+  console.log(`📂 Opened database: ${db.getDbPath()}`);
   
   const data: DashboardData = {
     runs: db.getRecentTestRuns(20),

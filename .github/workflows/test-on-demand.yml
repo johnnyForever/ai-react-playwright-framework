@@ -135,11 +135,12 @@ jobs:
           VITE_ADMIN_EMAIL: ${{ secrets.TEST_ADMIN_EMAIL }}
           VITE_ADMIN_PASSWORD: ${{ secrets.TEST_ADMIN_PASSWORD }}
       
-      - name: � Debug - List test artifacts
+      - name: 🔍 Debug - List test artifacts
         if: always()
         run: |
           echo "=== Allure Results ==="
           ls -la allure-results/ 2>/dev/null | head -20 || echo "allure-results folder not found"
+          echo "Result files count: $(ls allure-results/*-result.json 2>/dev/null | wc -l)"
           echo ""
           echo "=== Test Results ==="
           ls -la test-results/ 2>/dev/null || echo "test-results folder not found"
@@ -148,8 +149,12 @@ jobs:
           if [ -f "test-results/test-analytics.db" ]; then
             echo "Database exists: $(ls -la test-results/test-analytics.db)"
             echo "Database size: $(du -h test-results/test-analytics.db)"
+            # Check for WAL files
+            ls -la test-results/test-analytics.db* 2>/dev/null || echo "No WAL files"
           else
             echo "Database file not found!"
+            echo "Contents of test-results/:"
+            ls -la test-results/ 2>/dev/null || echo "test-results folder doesn't exist"
           fi
 
       - name: 📊 Generate test dashboard
