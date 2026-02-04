@@ -103,15 +103,40 @@ export class TestDatabase {
   private constructor(dbPath?: string) {
     this.dbPath = dbPath || path.join(process.cwd(), 'test-results', 'test-analytics.db');
 
+    // Debug: Log the path being used
+    console.log(`[DB] Initializing database at: ${this.dbPath}`);
+    console.log(`[DB] Current working directory: ${process.cwd()}`);
+
     // Ensure directory exists
     const dir = path.dirname(this.dbPath);
     if (!fs.existsSync(dir)) {
       fs.mkdirSync(dir, { recursive: true });
+      console.log(`[DB] Created directory: ${dir}`);
+    } else {
+      console.log(`[DB] Directory exists: ${dir}`);
     }
 
     this.db = new Database(this.dbPath);
-    this.db.pragma('journal_mode = WAL');
+    
+    // Use DELETE journal mode in CI for better compatibility, WAL locally for performance
+    const isCI = process.env.CI === 'true';
+    if (isCI) {
+      this.db.pragma('journal_mode = DELETE');
+      console.log('[DB] Using DELETE journal mode (CI environment)');
+    } else {
+      this.db.pragma('journal_mode = WAL');
+      console.log('[DB] Using WAL journal mode (local environment)');
+    }
+    
     this.initSchema();
+    
+    // Debug: Verify file exists after initialization
+    if (fs.existsSync(this.dbPath)) {
+      const stats = fs.statSync(this.dbPath);
+      console.log(`[DB] Database file created: ${stats.size} bytes`);
+    } else {
+      console.error(`[DB] ERROR: Database file NOT found after initialization!`);
+    }
   }
 
   static getInstance(dbPath?: string): TestDatabase {
@@ -323,13 +348,49 @@ export class TestDatabase {
    * This is important for CI where another process reads the database.
    */
   checkpoint(): void {
+    console.log('[DB] Checkpointing database...');
     this.db.pragma('wal_checkpoint(TRUNCATE)');
+    
+    // Debug: Verify file exists after checkpoint
+    if (fs.existsSync(this.dbPath)) {
+      const stats = fs.statSync(this.dbPath);
+      console.log(`[DB] After checkpoint - file size: ${stats.size} bytes`);
+      // Also check for WAL files
+      const walPath = this.dbPath + '-wal';
+      const shmPath = this.dbPath + '-shm';
+      if (fs.existsSync(walPath)) {
+        console.log(`[DB] WAL file exists: ${fs.statSync(walPath).size} bytes`);
+      }
+      if (fs.existsSync(shmPath)) {
+        console.log(`[DB] SHM file exists: ${fs.statSync(shmPath).size} bytes`);
+      }
+    } else {
+      console.error(`[DB] ERROR: Database file NOT found after checkpoint!`);
+      // List directory contents for debugging
+      const dir = path.dirname(this.dbPath);
+      console.log(`[DB] Contents of ${dir}:`);
+      try {
+        const files = fs.readdirSync(dir);
+        files.forEach(f => console.log(`[DB]   - ${f}`));
+      } catch (e) {
+        console.error(`[DB] Cannot list directory: ${e}`);
+      }
+    }
   }
 
   close(): void {
+    console.log('[DB] Closing database...');
     // Checkpoint WAL before closing to ensure all data is in main DB file
     this.checkpoint();
     this.db.close();
+    
+    // Final verification
+    if (fs.existsSync(this.dbPath)) {
+      const stats = fs.statSync(this.dbPath);
+      console.log(`[DB] After close - file exists: ${stats.size} bytes`);
+    } else {
+      console.error(`[DB] ERROR: Database file NOT found after close!`);
+    }
   }
 
   getDbPath(): string {
