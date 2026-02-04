@@ -36,7 +36,41 @@ Custom Playwright reporter that:
 - Stores metadata (git branch, commit, environment)
 - Calculates pass rates and flakiness
 
-### 3. Dashboard (`npm run test:dashboard`)
+### 3. Dashboard Module (`tests/reporters/dashboard/`)
+
+Modular dashboard generator with separated concerns:
+
+| File | Class | Responsibility |
+|------|-------|----------------|
+| `types.ts` | - | Type definitions (`DashboardData`, `DashboardConfig`, etc.) |
+| `DashboardUtils.ts` | `DashboardUtils` | Static utilities: `formatDuration()`, `escapeHtml()`, etc. |
+| `DashboardDataService.ts` | `DashboardDataService` | Data fetching from database |
+| `HtmlTemplateEngine.ts` | `HtmlTemplateEngine` | HTML generation with section methods |
+| `DashboardGenerator.ts` | `DashboardGenerator` | Main orchestrator class |
+| `index.ts` | - | Module exports and CLI entry |
+
+#### Usage
+
+```typescript
+// Simple usage (backward compatible)
+import { generateDashboard } from './reporters/dashboardGenerator';
+generateDashboard();
+
+// Class-based usage
+import { DashboardGenerator } from './reporters/dashboard';
+
+// Static method
+DashboardGenerator.generate(dbPath, outputPath);
+
+// Instance with config
+const generator = new DashboardGenerator({
+  dbPath: './custom-path/analytics.db',
+  outputPath: './reports/dashboard.html',
+  recentRunsLimit: 30,
+  flakyTestsLimit: 15,
+});
+generator.generate();
+```
 
 Interactive HTML dashboard showing:
 - Recent test runs

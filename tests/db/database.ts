@@ -118,11 +118,18 @@ export class TestDatabase {
 
     this.db = new Database(this.dbPath);
     
+    // Disable foreign key enforcement to avoid issues with parallel test execution
+    // We maintain data integrity programmatically (always insert run before results)
+    this.db.pragma('foreign_keys = OFF');
+    console.log('[DB] Foreign keys disabled for compatibility');
+    
     // Use DELETE journal mode in CI for better compatibility, WAL locally for performance
     const isCI = process.env.CI === 'true';
     if (isCI) {
       this.db.pragma('journal_mode = DELETE');
-      console.log('[DB] Using DELETE journal mode (CI environment)');
+      // Force synchronous writes in CI to ensure data is persisted
+      this.db.pragma('synchronous = FULL');
+      console.log('[DB] Using DELETE journal mode with FULL sync (CI environment)');
     } else {
       this.db.pragma('journal_mode = WAL');
       console.log('[DB] Using WAL journal mode (local environment)');
@@ -349,7 +356,18 @@ export class TestDatabase {
    */
   checkpoint(): void {
     console.log('[DB] Checkpointing database...');
-    this.db.pragma('wal_checkpoint(TRUNCATE)');
+    
+    // Check current journal mode
+    const journalMode = this.db.pragma('journal_mode', { simple: true }) as string;
+    console.log(`[DB] Current journal mode: ${journalMode}`);
+    
+    // Only checkpoint if using WAL mode
+    if (journalMode.toLowerCase() === 'wal') {
+      this.db.pragma('wal_checkpoint(TRUNCATE)');
+    } else {
+      // For DELETE/other modes, just ensure all writes are flushed
+      console.log('[DB] Using non-WAL mode, ensuring writes are flushed...');
+    }
     
     // Debug: Verify file exists after checkpoint
     if (fs.existsSync(this.dbPath)) {

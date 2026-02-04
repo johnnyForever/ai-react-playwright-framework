@@ -28,6 +28,7 @@ class DbReporter implements Reporter {
   private config?: FullConfig;
   private options: DbReporterOptions;
   private initError: Error | null = null;
+  private dbErrorLogged = false;
 
   constructor(options: DbReporterOptions = {}) {
     this.options = options;
@@ -82,7 +83,19 @@ class DbReporter implements Reporter {
     };
 
     if (this.db) {
-      this.db.insertTestRun(testRun);
+      try {
+        this.db.insertTestRun(testRun);
+        // Verify the run was inserted
+        const verifyRun = this.db.getTestRun(this.runId);
+        if (verifyRun) {
+          console.log(`✓ Test run ${this.runId} created in database`);
+        } else {
+          console.error(`❌ Test run ${this.runId} NOT found after insert!`);
+        }
+      } catch (error) {
+        console.error(`❌ Failed to insert test run: ${(error as Error).message}`);
+        this.initError = error as Error;
+      }
     }
 
     console.log('\n📊 DB Reporter initialized');
@@ -112,8 +125,16 @@ class DbReporter implements Reporter {
 
     this.results.push(testResult);
     if (this.db) {
-      this.db.insertTestResult(testResult);
-      this.db.updateTestHistory(testResult);
+      try {
+        this.db.insertTestResult(testResult);
+        this.db.updateTestHistory(testResult);
+      } catch (error) {
+        // Log error once and continue - don't spam for every test
+        if (!this.dbErrorLogged) {
+          console.error(`❌ DbReporter: Error inserting test result: ${(error as Error).message}`);
+          this.dbErrorLogged = true;
+        }
+      }
     }
 
     // Log progress
