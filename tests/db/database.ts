@@ -101,7 +101,8 @@ export class TestDatabase {
   private dbPath: string;
 
   private constructor(dbPath?: string) {
-    this.dbPath = dbPath || path.join(process.cwd(), 'test-results', 'test-analytics.db');
+    // Use .test-db directory to avoid Playwright cleaning the test-results directory
+    this.dbPath = dbPath || path.join(process.cwd(), '.test-db', 'test-analytics.db');
 
     // Debug: Log the path being used
     console.log(`[DB] Initializing database at: ${this.dbPath}`);

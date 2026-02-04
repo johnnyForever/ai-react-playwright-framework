@@ -24,7 +24,7 @@ export class DashboardGenerator {
    * @param config - Configuration options
    */
   constructor(config?: DashboardConfig) {
-    this.dbPath = config?.dbPath || path.join(process.cwd(), 'test-results', 'test-analytics.db');
+    this.dbPath = config?.dbPath || path.join(process.cwd(), '.test-db', 'test-analytics.db');
     this.outputPath = config?.outputPath || path.join(process.cwd(), 'test-results', 'dashboard.html');
     this.templateEngine = new HtmlTemplateEngine();
   }

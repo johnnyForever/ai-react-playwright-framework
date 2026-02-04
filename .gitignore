@@ -28,6 +28,7 @@ dist-ssr
 playwright-report/
 test-results/
 .playwright/
+.test-db/
 *.db
 *.db-wal
 *.db-shm

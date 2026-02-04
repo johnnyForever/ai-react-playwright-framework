@@ -67,15 +67,15 @@ jobs:
           ls -la test-results/ 2>/dev/null || echo "test-results folder not found"
           echo ""
           echo "=== Database file check ==="
-          if [ -f "test-results/test-analytics.db" ]; then
-            echo "Database exists: $(ls -la test-results/test-analytics.db)"
-            echo "Database size: $(du -h test-results/test-analytics.db)"
+          if [ -f ".test-db/test-analytics.db" ]; then
+            echo "Database exists: $(ls -la .test-db/test-analytics.db)"
+            echo "Database size: $(du -h .test-db/test-analytics.db)"
             # Check for WAL files
-            ls -la test-results/test-analytics.db* 2>/dev/null || echo "No WAL files"
+            ls -la .test-db/test-analytics.db* 2>/dev/null || echo "No WAL files"
           else
             echo "Database file not found!"
-            echo "Contents of test-results/:"
-            ls -la test-results/ 2>/dev/null || echo "test-results folder doesn't exist"
+            echo "Contents of .test-db/:"
+            ls -la .test-db/ 2>/dev/null || echo ".test-db folder doesn't exist"
           fi
 
       - name: 📊 Generate test dashboard

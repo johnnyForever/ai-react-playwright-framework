@@ -326,7 +326,7 @@ db.clearOldRuns(30);
 
 ```bash
 # Delete database file
-rm test-results/test-analytics.db
+rm .test-db/test-analytics.db
 
 # Database will be recreated on next test run
 ```
@@ -335,10 +335,10 @@ rm test-results/test-analytics.db
 
 ```bash
 # Simple backup
-cp test-results/test-analytics.db test-results/backup.db
+cp .test-db/test-analytics.db .test-db/backup.db
 
 # With timestamp
-cp test-results/test-analytics.db "test-results/backup-$(date +%Y%m%d).db"
+cp .test-db/test-analytics.db ".test-db/backup-$(date +%Y%m%d).db"
 ```
 
 ## CI/CD Integration
@@ -357,7 +357,7 @@ cp test-results/test-analytics.db "test-results/backup-$(date +%Y%m%d).db"
   if: always()
   with:
     name: test-analytics-db
-    path: test-results/test-analytics.db
+    path: .test-db/test-analytics.db
     retention-days: 30
 ```
 
@@ -381,7 +381,7 @@ Direct SQL access for custom queries:
 
 ```bash
 # Open database
-sqlite3 test-results/test-analytics.db
+sqlite3 .test-db/test-analytics.db
 
 # Recent failures
 SELECT test_name, error_message 

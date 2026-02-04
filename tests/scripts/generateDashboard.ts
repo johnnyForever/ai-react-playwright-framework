@@ -6,7 +6,6 @@
 
 import { generateDashboard } from '../reporters/dashboardGenerator';
 import { TestDatabase } from '../db/database';
-import * as path from 'path';
 
 const args = process.argv.slice(2);
 const command = args[0] || 'dashboard';
