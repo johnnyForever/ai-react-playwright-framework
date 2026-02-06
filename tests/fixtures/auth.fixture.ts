@@ -1,6 +1,6 @@
 import { test as base } from '@playwright/test';
-import { LoginPage, DashboardPage, ProductDetailPage, CheckoutPage } from '@tests/pages';
-import { TestLogger, createLogger } from '@tests/utils/logger';
+import { CheckoutPage, DashboardPage, LoginPage, ProductDetailPage } from '@tests/pages';
+import { createLogger, type TestLogger } from '@tests/utils/logger';
 import { v4 as uuidv4 } from 'uuid';
 
 // Get or create run ID for this test session
@@ -19,13 +19,13 @@ interface AuthFixtures {
 }
 
 export const test = base.extend<AuthFixtures>({
-  logger: async ({ }, use, testInfo) => {
+  logger: async (_deps, use, testInfo) => {
     // Create logger for this test
     const logger = createLogger(RUN_ID, testInfo);
     logger.testStart();
-    
+
     await use(logger);
-    
+
     // Log test end
     logger.testEnd();
   },

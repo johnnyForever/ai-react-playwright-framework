@@ -1,6 +1,6 @@
-import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
-import { login, logout, getCurrentUser, isAuthenticated } from './authService';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { testCredentials } from '@/test/testCredentials';
+import { getCurrentUser, isAuthenticated, login, logout } from './authService';
 
 describe('authService', () => {
   // Mock localStorage
@@ -104,10 +104,10 @@ describe('authService', () => {
 
       // Check that setItem was called with session duration key
       const sessionDurationCall = localStorageMock.setItem.mock.calls.find(
-        (call) => call[0] === 'auth_session_duration'
+        (call) => call[0] === 'auth_session_duration',
       );
       expect(sessionDurationCall).toBeDefined();
-      
+
       const expiresAt = parseInt(sessionDurationCall![1], 10);
       const sevenDaysFromNow = Date.now() + 7 * 24 * 60 * 60 * 1000;
       // Allow 5 second tolerance
@@ -122,10 +122,10 @@ describe('authService', () => {
       });
 
       const sessionDurationCall = localStorageMock.setItem.mock.calls.find(
-        (call) => call[0] === 'auth_session_duration'
+        (call) => call[0] === 'auth_session_duration',
       );
       expect(sessionDurationCall).toBeDefined();
-      
+
       const expiresAt = parseInt(sessionDurationCall![1], 10);
       const oneHourFromNow = Date.now() + 60 * 60 * 1000;
       const sevenDaysFromNow = Date.now() + 7 * 24 * 60 * 60 * 1000;

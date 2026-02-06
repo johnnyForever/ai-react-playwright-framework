@@ -1,11 +1,10 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { renderWithBasket, createMockProduct } from '@/test/testUtils';
-import { CheckoutContent } from './CheckoutContent';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import * as BasketContext from '@/features/basket/BasketContext';
+import { createMockProduct, renderWithBasket } from '@/test/testUtils';
 import type { Product } from '@/types/product';
-import { afterEach } from 'vitest';
+import { CheckoutContent } from './CheckoutContent';
 
 describe('CheckoutContent', () => {
   const mockProducts: Product[] = [
@@ -168,7 +167,7 @@ describe('CheckoutContent', () => {
     it('should call removeFromBasket when remove button is clicked', async () => {
       const user = userEvent.setup();
       const mockRemoveFromBasket = vi.fn();
-      
+
       vi.spyOn(BasketContext, 'useBasket').mockReturnValue({
         items: mockProducts,
         addToBasket: vi.fn(),
@@ -211,12 +210,12 @@ describe('CheckoutContent', () => {
   describe('price formatting', () => {
     it('should format prices with currency symbol', () => {
       vi.spyOn(BasketContext, 'useBasket').mockReturnValue({
-        items: [createMockProduct({ id: '1', price: 1000.50 })],
+        items: [createMockProduct({ id: '1', price: 1000.5 })],
         addToBasket: vi.fn(),
         removeFromBasket: vi.fn(),
         isInBasket: vi.fn(),
         getBasketCount: () => 1,
-        getBasketTotal: () => 1000.50,
+        getBasketTotal: () => 1000.5,
         clearBasket: vi.fn(),
       });
 

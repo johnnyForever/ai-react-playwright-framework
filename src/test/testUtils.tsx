@@ -1,5 +1,5 @@
-import { type ReactNode } from 'react';
-import { render, type RenderOptions, type RenderResult } from '@testing-library/react';
+import { type RenderOptions, type RenderResult, render } from '@testing-library/react';
+import type { ReactNode } from 'react';
 import { MemoryRouter, type MemoryRouterProps } from 'react-router-dom';
 import { BasketProvider } from '@/features/basket/BasketContext';
 
@@ -44,7 +44,7 @@ function createWrapper({
  */
 export function renderWithRouter(
   ui: React.ReactElement,
-  options: CustomRenderOptions = {}
+  options: CustomRenderOptions = {},
 ): RenderResult {
   const { initialEntries, withBasket, ...renderOptions } = options;
   return render(ui, {
@@ -58,7 +58,7 @@ export function renderWithRouter(
  */
 export function renderWithBasket(
   ui: React.ReactElement,
-  options: CustomRenderOptions = {}
+  options: CustomRenderOptions = {},
 ): RenderResult {
   const { initialEntries = ['/'], ...renderOptions } = options;
   return render(ui, {
@@ -72,7 +72,7 @@ export function renderWithBasket(
  */
 export function renderWithProviders(
   ui: React.ReactElement,
-  options: CustomRenderOptions = {}
+  options: CustomRenderOptions = {},
 ): RenderResult {
   const { initialEntries = ['/'], ...renderOptions } = options;
   return render(ui, {
@@ -84,7 +84,9 @@ export function renderWithProviders(
 /**
  * Mock product factory for tests
  */
-export function createMockProduct(overrides: Partial<import('@/types/product').Product> = {}): import('@/types/product').Product {
+export function createMockProduct(
+  overrides: Partial<import('@/types/product').Product> = {},
+): import('@/types/product').Product {
   return {
     id: '1',
     name: 'Test Product',
@@ -98,7 +100,9 @@ export function createMockProduct(overrides: Partial<import('@/types/product').P
 /**
  * Mock user factory for tests
  */
-export function createMockUser(overrides: Partial<import('@/types/auth').User> = {}): import('@/types/auth').User {
+export function createMockUser(
+  overrides: Partial<import('@/types/auth').User> = {},
+): import('@/types/auth').User {
   return {
     id: '1',
     email: 'test@test.com',

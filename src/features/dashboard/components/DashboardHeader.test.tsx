@@ -1,9 +1,9 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { renderWithBasket, createMockUser } from '@/test/testUtils';
-import { DashboardHeader } from './DashboardHeader';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import * as authService from '@/services/authService';
+import { createMockUser, renderWithBasket } from '@/test/testUtils';
+import { DashboardHeader } from './DashboardHeader';
 
 // Mock the auth service
 vi.mock('@/services/authService', () => ({
@@ -25,7 +25,7 @@ describe('DashboardHeader', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     vi.mocked(authService.getCurrentUser).mockReturnValue(
-      createMockUser({ email: 'test@example.com', role: 'user' })
+      createMockUser({ email: 'test@example.com', role: 'user' }),
     );
   });
 
@@ -64,9 +64,7 @@ describe('DashboardHeader', () => {
 
   describe('admin badge', () => {
     it('should NOT display admin badge for regular user', () => {
-      vi.mocked(authService.getCurrentUser).mockReturnValue(
-        createMockUser({ role: 'user' })
-      );
+      vi.mocked(authService.getCurrentUser).mockReturnValue(createMockUser({ role: 'user' }));
 
       renderWithBasket(<DashboardHeader />);
 
@@ -75,7 +73,7 @@ describe('DashboardHeader', () => {
 
     it('should display admin badge for admin user', () => {
       vi.mocked(authService.getCurrentUser).mockReturnValue(
-        createMockUser({ role: 'admin', email: 'admin@example.com' })
+        createMockUser({ role: 'admin', email: 'admin@example.com' }),
       );
 
       renderWithBasket(<DashboardHeader />);

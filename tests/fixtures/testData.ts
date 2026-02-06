@@ -3,7 +3,7 @@
  * Credentials loaded from environment variables via factory
  */
 
-import { UserFactory, ProductFactory, RouteFactory } from '@tests/utils/testDataFactory';
+import { ProductFactory, RouteFactory, UserFactory } from '@tests/utils/testDataFactory';
 
 // Re-export factory functions as static values for backward compatibility
 export const validUser = UserFactory.validUser();
@@ -31,4 +31,10 @@ export const sortedByPriceAsc = ProductFactory.sortedByPriceAsc();
 export const sortedByPriceDesc = ProductFactory.sortedByPriceDesc();
 
 // Re-export factories for advanced usage
-export { UserFactory, ProductFactory, RouteFactory, StringFactory, NumberFactory } from '@tests/utils/testDataFactory';
+export {
+  NumberFactory,
+  ProductFactory,
+  RouteFactory,
+  StringFactory,
+  UserFactory,
+} from '@tests/utils/testDataFactory';

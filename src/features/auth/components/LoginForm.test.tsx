@@ -1,10 +1,10 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { renderWithRouter } from '@/test/testUtils';
-import { LoginForm } from './LoginForm';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import * as authService from '@/services/authService';
 import { testCredentials } from '@/test/testCredentials';
+import { renderWithRouter } from '@/test/testUtils';
+import { LoginForm } from './LoginForm';
 
 // Mock the auth service
 vi.mock('@/services/authService', () => ({
@@ -252,7 +252,7 @@ describe('LoginForm', () => {
 
       await waitFor(() => {
         expect(screen.getByTestId('login-error')).toHaveTextContent(
-          'An unexpected error occurred. Please try again.'
+          'An unexpected error occurred. Please try again.',
         );
       });
 
@@ -264,9 +264,10 @@ describe('LoginForm', () => {
       // Create a promise that we can control
       let resolveLogin: (value: { success: boolean }) => void;
       vi.mocked(authService.login).mockImplementation(
-        () => new Promise((resolve) => {
-          resolveLogin = resolve;
-        })
+        () =>
+          new Promise((resolve) => {
+            resolveLogin = resolve;
+          }),
       );
 
       renderWithRouter(<LoginForm />);

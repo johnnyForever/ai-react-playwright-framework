@@ -1,7 +1,7 @@
 /**
  * Test credentials configuration for unit tests
  * Loads credentials from import.meta.env (Vite environment variables)
- * 
+ *
  * These values MUST be set in .env file with VITE_ prefix:
  * - VITE_USER_EMAIL
  * - VITE_USER_PASSWORD

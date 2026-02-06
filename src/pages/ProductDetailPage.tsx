@@ -1,6 +1,6 @@
 import { useParams } from 'react-router-dom';
-import { DashboardHeader, ProductDetail } from '@/features/dashboard';
 import { getProductById } from '@/data/products';
+import { DashboardHeader, ProductDetail } from '@/features/dashboard';
 import '@/styles/dashboard.css';
 
 export function ProductDetailPage(): React.JSX.Element {

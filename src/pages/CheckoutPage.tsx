@@ -1,5 +1,5 @@
-import { DashboardHeader } from '@/features/dashboard';
 import { CheckoutContent } from '@/features/checkout';
+import { DashboardHeader } from '@/features/dashboard';
 import '@/styles/dashboard.css';
 
 export function CheckoutPage(): React.JSX.Element {

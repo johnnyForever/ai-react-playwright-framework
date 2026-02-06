@@ -3,7 +3,13 @@ import { useBasket } from '@/features/basket';
 import type { Product } from '@/types/product';
 import './CheckoutContent.css';
 
-function CheckoutItem({ product, onRemove }: { product: Product; onRemove: () => void }): React.JSX.Element {
+function CheckoutItem({
+  product,
+  onRemove,
+}: {
+  product: Product;
+  onRemove: () => void;
+}): React.JSX.Element {
   const formattedPrice = new Intl.NumberFormat('en-US', {
     style: 'currency',
     currency: 'USD',
@@ -21,7 +27,10 @@ function CheckoutItem({ product, onRemove }: { product: Product; onRemove: () =>
         <h3 className="checkout-item__name" data-testid={`checkout-item-name-${product.id}`}>
           {product.name}
         </h3>
-        <p className="checkout-item__description" data-testid={`checkout-item-description-${product.id}`}>
+        <p
+          className="checkout-item__description"
+          data-testid={`checkout-item-description-${product.id}`}
+        >
           {product.description}
         </p>
         <div className="checkout-item__price" data-testid={`checkout-item-price-${product.id}`}>
@@ -69,10 +78,16 @@ export function CheckoutContent(): React.JSX.Element {
   if (items.length === 0) {
     return (
       <div className="checkout" data-testid="checkout-page">
-        <h1 className="checkout__title" data-testid="checkout-title">Checkout</h1>
+        <h1 className="checkout__title" data-testid="checkout-title">
+          Checkout
+        </h1>
         <div className="checkout__empty" data-testid="checkout-empty">
           <p>Your basket is empty.</p>
-          <Link to="/dashboard" className="checkout__continue-shopping" data-testid="continue-shopping">
+          <Link
+            to="/dashboard"
+            className="checkout__continue-shopping"
+            data-testid="continue-shopping"
+          >
             Continue Shopping
           </Link>
         </div>
@@ -82,8 +97,10 @@ export function CheckoutContent(): React.JSX.Element {
 
   return (
     <div className="checkout" data-testid="checkout-page">
-      <h1 className="checkout__title" data-testid="checkout-title">Checkout</h1>
-      
+      <h1 className="checkout__title" data-testid="checkout-title">
+        Checkout
+      </h1>
+
       <div className="checkout__content">
         <section className="checkout__items">
           <h2 className="checkout__section-title">Your Items ({totalQuantity})</h2>
@@ -106,10 +123,18 @@ export function CheckoutContent(): React.JSX.Element {
             <span>Total Price:</span>
             <span data-testid="checkout-total-price">{formattedTotal}</span>
           </div>
-          <Link to="/order-confirmation" className="checkout__finish-order" data-testid="finish-order">
+          <Link
+            to="/order-confirmation"
+            className="checkout__finish-order"
+            data-testid="finish-order"
+          >
             Finish Order
           </Link>
-          <Link to="/dashboard" className="checkout__continue-shopping" data-testid="continue-shopping">
+          <Link
+            to="/dashboard"
+            className="checkout__continue-shopping"
+            data-testid="continue-shopping"
+          >
             Continue Shopping
           </Link>
         </aside>

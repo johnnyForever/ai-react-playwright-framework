@@ -1,7 +1,7 @@
-import { describe, it, expect, vi } from 'vitest';
-import { renderHook, act } from '@testing-library/react';
-import { BasketProvider, useBasket } from './BasketContext';
+import { act, renderHook } from '@testing-library/react';
+import { describe, expect, it, vi } from 'vitest';
 import type { Product } from '@/types/product';
+import { BasketProvider, useBasket } from './BasketContext';
 
 // Helper to create mock products
 const createProduct = (id: string, price: number = 10): Product => ({
@@ -17,11 +17,11 @@ describe('BasketContext', () => {
     it('should throw error when used outside BasketProvider', () => {
       // Suppress console.error for this test
       const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-      
+
       expect(() => {
         renderHook(() => useBasket());
       }).toThrow('useBasket must be used within a BasketProvider');
-      
+
       consoleSpy.mockRestore();
     });
   });

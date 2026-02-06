@@ -1,8 +1,8 @@
-import { describe, it, expect, vi } from 'vitest';
 import { screen } from '@testing-library/react';
+import { describe, expect, it, vi } from 'vitest';
 import { renderWithBasket } from '@/test/testUtils';
-import { BasketIcon } from './BasketIcon';
 import * as BasketContext from './BasketContext';
+import { BasketIcon } from './BasketIcon';
 
 describe('BasketIcon', () => {
   it('should render basket icon', () => {
@@ -63,9 +63,7 @@ describe('BasketIcon', () => {
 
   it('should display correct count number', () => {
     vi.spyOn(BasketContext, 'useBasket').mockReturnValue({
-      items: [
-        { id: '1', name: 'Product 1', description: 'Desc', price: 10, imageUrl: '/img.jpg' },
-      ],
+      items: [{ id: '1', name: 'Product 1', description: 'Desc', price: 10, imageUrl: '/img.jpg' }],
       addToBasket: vi.fn(),
       removeFromBasket: vi.fn(),
       isInBasket: vi.fn(),

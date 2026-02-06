@@ -1,5 +1,5 @@
-import { test, expect, DEFAULT_THRESHOLDS } from '../fixtures/api.fixture';
 import { testCredentials } from '../config/credentials';
+import { DEFAULT_THRESHOLDS, expect, test } from '../fixtures/api.fixture';
 
 /**
  * Performance tests for API endpoints
@@ -53,7 +53,7 @@ test.describe('API Performance Tests @api @performance @regression', () => {
     test('should maintain performance under load (20 requests)', async ({ api }) => {
       const requests = 20;
       const promises = Array.from({ length: requests }, (_, i) =>
-        api.get(`/api/products/${(i % 4) + 1}`)
+        api.get(`/api/products/${(i % 4) + 1}`),
       );
 
       await Promise.all(promises);
@@ -130,12 +130,12 @@ test.describe('API Performance Tests @api @performance @regression', () => {
       }
 
       const report = api.generateReport();
-      
+
       expect(report).toContain('API Performance Report');
       expect(report).toContain('Total Requests:');
       expect(report).toContain('Response Times:');
       expect(report).toContain('By Endpoint:');
-      
+
       console.log('\n' + report);
     });
   });

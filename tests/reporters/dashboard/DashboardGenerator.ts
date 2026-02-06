@@ -6,9 +6,9 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import { TestDatabase } from '../../db/database';
-import { DashboardConfig } from './types';
 import { DashboardDataService } from './DashboardDataService';
 import { HtmlTemplateEngine } from './HtmlTemplateEngine';
+import type { DashboardConfig } from './types';
 
 /**
  * Main dashboard generator class that orchestrates the entire generation process
@@ -25,7 +25,8 @@ export class DashboardGenerator {
    */
   constructor(config?: DashboardConfig) {
     this.dbPath = config?.dbPath || path.join(process.cwd(), '.test-db', 'test-analytics.db');
-    this.outputPath = config?.outputPath || path.join(process.cwd(), 'test-results', 'dashboard.html');
+    this.outputPath =
+      config?.outputPath || path.join(process.cwd(), 'test-results', 'dashboard.html');
     this.templateEngine = new HtmlTemplateEngine();
   }
 
@@ -35,18 +36,18 @@ export class DashboardGenerator {
    */
   generate(): string {
     this.logDatabaseInfo();
-    
+
     const db = this.openDatabase();
     this.dataService = new DashboardDataService(db);
-    
+
     console.log(`📂 Opened database: ${this.dataService.getDbPath()}`);
-    
+
     const data = this.dataService.fetchDashboardData();
     this.dataService.logDataSummary(data);
-    
+
     const html = this.templateEngine.build(data);
     this.writeOutput(html);
-    
+
     console.log(`📊 Dashboard generated: ${this.outputPath}`);
     return this.outputPath;
   }
@@ -56,7 +57,7 @@ export class DashboardGenerator {
    */
   private logDatabaseInfo(): void {
     console.log(`📂 Expected database path: ${this.dbPath}`);
-    
+
     if (fs.existsSync(this.dbPath)) {
       const stats = fs.statSync(this.dbPath);
       console.log(`📂 Database file exists: ${stats.size} bytes`);
@@ -82,7 +83,7 @@ export class DashboardGenerator {
     if (!fs.existsSync(outputDir)) {
       fs.mkdirSync(outputDir, { recursive: true });
     }
-    
+
     fs.writeFileSync(this.outputPath, html);
   }
 

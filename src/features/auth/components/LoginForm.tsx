@@ -1,7 +1,7 @@
-import { useState, type FormEvent, type JSX } from 'react';
+import { type FormEvent, type JSX, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { hasErrors, validateLoginForm } from '@/lib/validation';
 import { login } from '@/services/authService';
-import { validateLoginForm, hasErrors } from '@/lib/validation';
 import type { ValidationErrors } from '@/types/auth';
 import './LoginForm.css';
 
@@ -71,7 +71,9 @@ export function LoginForm({
 
   return (
     <form className="login-form" onSubmit={handleSubmit} noValidate data-testid="login-form">
-      <h1 className="login-form__title" data-testid="login-title">{title}</h1>
+      <h1 className="login-form__title" data-testid="login-title">
+        {title}
+      </h1>
 
       {apiError && (
         <div className="login-form__api-error" role="alert" data-testid="login-error">
@@ -96,7 +98,12 @@ export function LoginForm({
           data-testid="email-input"
         />
         {validationErrors.email && (
-          <div id="email-error" className="login-form__error" role="alert" data-testid="email-error">
+          <div
+            id="email-error"
+            className="login-form__error"
+            role="alert"
+            data-testid="email-error"
+          >
             {validationErrors.email}
           </div>
         )}
@@ -119,7 +126,12 @@ export function LoginForm({
           data-testid="password-input"
         />
         {validationErrors.password && (
-          <div id="password-error" className="login-form__error" role="alert" data-testid="password-error">
+          <div
+            id="password-error"
+            className="login-form__error"
+            role="alert"
+            data-testid="password-error"
+          >
             {validationErrors.password}
           </div>
         )}

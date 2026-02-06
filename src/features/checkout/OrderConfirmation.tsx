@@ -1,6 +1,6 @@
+import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useBasket } from '@/features/basket';
-import { useEffect } from 'react';
 import './OrderConfirmation.css';
 
 export function OrderConfirmation(): React.JSX.Element {
@@ -29,19 +29,22 @@ export function OrderConfirmation(): React.JSX.Element {
             <polyline points="22 4 12 14.01 9 11.01" />
           </svg>
         </div>
-        
+
         <h1 className="order-confirmation__title" data-testid="order-confirmation-title">
           Thank You for Your Order!
         </h1>
-        
+
         <p className="order-confirmation__message" data-testid="order-confirmation-message">
-          Your order has been successfully placed. We&apos;ll send you an email confirmation shortly.
+          Your order has been successfully placed. We&apos;ll send you an email confirmation
+          shortly.
         </p>
 
         <div className="order-confirmation__details">
           <div className="order-confirmation__detail-row">
             <span>Order Number:</span>
-            <span data-testid="order-number">#{Math.random().toString(36).substring(2, 10).toUpperCase()}</span>
+            <span data-testid="order-number">
+              #{Math.random().toString(36).substring(2, 10).toUpperCase()}
+            </span>
           </div>
           <div className="order-confirmation__detail-row">
             <span>Estimated Delivery:</span>

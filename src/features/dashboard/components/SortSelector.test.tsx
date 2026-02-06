@@ -1,8 +1,8 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { screen, render } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { SortSelector } from './SortSelector';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { SortOption } from '@/types/product';
+import { SortSelector } from './SortSelector';
 
 describe('SortSelector', () => {
   const defaultProps = {
@@ -100,11 +100,11 @@ describe('SortSelector', () => {
       render(<SortSelector value="name-asc" onChange={onChange} />);
 
       const select = screen.getByRole('combobox');
-      
+
       // Tab to select element (ensures it's focusable)
       await user.tab();
       expect(select).toHaveFocus();
-      
+
       // Change selection using keyboard
       await user.selectOptions(select, 'price-asc');
       expect(onChange).toHaveBeenCalledWith('price-asc');

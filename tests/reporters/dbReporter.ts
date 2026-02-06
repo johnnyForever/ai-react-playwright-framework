@@ -3,16 +3,10 @@
  * Stores test results in SQLite for historical analysis
  */
 
-import type {
-  FullConfig,
-  Reporter,
-  Suite,
-  TestCase,
-  TestResult,
-} from '@playwright/test/reporter';
+import type { FullConfig, Reporter, Suite, TestCase, TestResult } from '@playwright/test/reporter';
 import { execSync } from 'child_process';
 import { v4 as uuidv4 } from 'uuid';
-import { TestDatabase, TestRun, TestResult as DbTestResult } from '../db/database';
+import { type TestResult as DbTestResult, TestDatabase, type TestRun } from '../db/database';
 
 interface DbReporterOptions {
   dbPath?: string;
@@ -58,7 +52,7 @@ class DbReporter implements Reporter {
     const trigger = this.options.trigger || process.env.TEST_TRIGGER || 'manual';
 
     // Get browser and tags from config
-    const browsers = config.projects.map(p => p.name).join(',');
+    const browsers = config.projects.map((p) => p.name).join(',');
     const grepTag = config.grep?.toString() || '';
 
     const testRun: TestRun = {
@@ -76,7 +70,7 @@ class DbReporter implements Reporter {
       environment,
       trigger,
       tags: grepTag,
-      browser: browsers
+      browser: browsers,
     };
 
     if (this.db) {
@@ -88,7 +82,9 @@ class DbReporter implements Reporter {
       }
     }
 
-    console.log(`\n📊 DB Reporter: Run ${this.runId.slice(0, 8)}... | ${totalTests} tests | ${environment}\n`);
+    console.log(
+      `\n📊 DB Reporter: Run ${this.runId.slice(0, 8)}... | ${totalTests} tests | ${environment}\n`,
+    );
   }
 
   onTestEnd(test: TestCase, result: TestResult): void {
@@ -104,10 +100,10 @@ class DbReporter implements Reporter {
       durationMs: result.duration,
       errorMessage: result.error?.message,
       errorStack: result.error?.stack,
-      screenshotPath: result.attachments.find(a => a.name === 'screenshot')?.path,
-      videoPath: result.attachments.find(a => a.name === 'video')?.path,
-      tracePath: result.attachments.find(a => a.name === 'trace')?.path,
-      retryCount: result.retry
+      screenshotPath: result.attachments.find((a) => a.name === 'screenshot')?.path,
+      videoPath: result.attachments.find((a) => a.name === 'video')?.path,
+      tracePath: result.attachments.find((a) => a.name === 'trace')?.path,
+      retryCount: result.retry,
     };
 
     this.results.push(testResult);
@@ -125,21 +121,23 @@ class DbReporter implements Reporter {
     }
 
     // Log progress
-    const statusIcon = {
-      passed: '✓',
-      failed: '✗',
-      skipped: '○',
-      timedOut: '⏱',
-      interrupted: '!'
-    }[result.status] || '?';
+    const statusIcon =
+      {
+        passed: '✓',
+        failed: '✗',
+        skipped: '○',
+        timedOut: '⏱',
+        interrupted: '!',
+      }[result.status] || '?';
 
-    const statusColor = {
-      passed: '\x1b[32m',
-      failed: '\x1b[31m',
-      skipped: '\x1b[33m',
-      timedOut: '\x1b[31m',
-      interrupted: '\x1b[31m'
-    }[result.status] || '';
+    const statusColor =
+      {
+        passed: '\x1b[32m',
+        failed: '\x1b[31m',
+        skipped: '\x1b[33m',
+        timedOut: '\x1b[31m',
+        interrupted: '\x1b[31m',
+      }[result.status] || '';
 
     console.log(`${statusColor}${statusIcon}\x1b[0m ${test.title} (${result.duration}ms)`);
   }
@@ -149,10 +147,10 @@ class DbReporter implements Reporter {
     const duration = endTime.getTime() - this.startTime.getTime();
 
     // Calculate summary
-    const passed = this.results.filter(r => r.status === 'passed').length;
-    const failed = this.results.filter(r => r.status === 'failed').length;
-    const skipped = this.results.filter(r => r.status === 'skipped').length;
-    const flaky = this.results.filter(r => r.retryCount > 0 && r.status === 'passed').length;
+    const passed = this.results.filter((r) => r.status === 'passed').length;
+    const failed = this.results.filter((r) => r.status === 'failed').length;
+    const skipped = this.results.filter((r) => r.status === 'skipped').length;
+    const flaky = this.results.filter((r) => r.retryCount > 0 && r.status === 'passed').length;
     const total = this.results.length;
     const passRate = total > 0 ? (passed / total) * 100 : 0;
 
@@ -166,7 +164,7 @@ class DbReporter implements Reporter {
         skipped,
         flaky,
         passRate,
-        durationMs: duration
+        durationMs: duration,
       });
     }
 
@@ -187,8 +185,8 @@ class DbReporter implements Reporter {
     // Show failed tests
     if (failed > 0) {
       console.log('\n❌ FAILED TESTS:');
-      const failedTests = this.results.filter(r => r.status === 'failed');
-      failedTests.forEach(t => {
+      const failedTests = this.results.filter((r) => r.status === 'failed');
+      failedTests.forEach((t) => {
         console.log(`   • ${t.testName}`);
         if (t.errorMessage) {
           console.log(`     ${t.errorMessage.split('\n')[0]}`);
@@ -199,8 +197,8 @@ class DbReporter implements Reporter {
     // Show flaky tests
     if (flaky > 0) {
       console.log('\n⚠️  FLAKY TESTS (passed on retry):');
-      const flakyTests = this.results.filter(r => r.retryCount > 0 && r.status === 'passed');
-      flakyTests.forEach(t => {
+      const flakyTests = this.results.filter((r) => r.retryCount > 0 && r.status === 'passed');
+      flakyTests.forEach((t) => {
         console.log(`   • ${t.testName} (${t.retryCount} retries)`);
       });
     }
@@ -210,7 +208,7 @@ class DbReporter implements Reporter {
       // Checkpoint and close database to ensure data is flushed for CI
       this.db.checkpoint();
       TestDatabase.resetInstance();
-      
+
       console.log('📁 Results stored in database');
       console.log(`   View report: npm run test:dashboard`);
     } else {

@@ -1,13 +1,13 @@
 /**
  * Test Credentials
  * Loads credentials from environment variables
- * 
+ *
  * Required environment variables:
  *   TEST_USER_EMAIL - Standard user email
  *   TEST_USER_PASSWORD - Standard user password
- *   TEST_ADMIN_EMAIL - Admin user email  
+ *   TEST_ADMIN_EMAIL - Admin user email
  *   TEST_ADMIN_PASSWORD - Admin user password
- * 
+ *
  * For encrypted credentials, you can also use ENCRYPTION_KEY with encrypted values
  */
 
@@ -37,7 +37,10 @@ if (!ADMIN_EMAIL || !ADMIN_PASSWORD) {
  * User credentials configuration
  * Passwords can be encrypted using AES-256-GCM when ENCRYPTION_KEY is set
  */
-const USERS: Record<string, { username: string; encryptedPassword: string; role: UserCredentials['role'] }> = {
+const USERS: Record<
+  string,
+  { username: string; encryptedPassword: string; role: UserCredentials['role'] }
+> = {
   standard: {
     username: USER_EMAIL,
     encryptedPassword: '', // Set for encrypted mode, empty for plain env vars
@@ -66,15 +69,17 @@ const ENV_PASSWORDS: Record<string, string> = {
  * Get decrypted credentials for a user type
  * Uses environment variables or falls back to encrypted passwords if configured
  */
-export function getCredentials(userType: 'standard' | 'admin' | 'invalid' = 'standard'): UserCredentials {
+export function getCredentials(
+  userType: 'standard' | 'admin' | 'invalid' = 'standard',
+): UserCredentials {
   const user = USERS[userType];
-  
+
   if (!user) {
     throw new Error(`Unknown user type: ${userType}`);
   }
-  
+
   let password: string;
-  
+
   // If encrypted password is set and encryption key exists, decrypt
   if (user.encryptedPassword && process.env.ENCRYPTION_KEY) {
     try {
@@ -87,7 +92,7 @@ export function getCredentials(userType: 'standard' | 'admin' | 'invalid' = 'sta
     // Use passwords from environment variables
     password = ENV_PASSWORDS[userType];
   }
-  
+
   return {
     username: user.username,
     password,

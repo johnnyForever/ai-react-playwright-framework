@@ -2,7 +2,7 @@
  * Type definitions for the Test Dashboard
  */
 
-import type { TestRun, TestResult, TestHistory } from '../../db/database';
+import type { TestHistory, TestResult, TestRun } from '../../db/database';
 
 /**
  * Aggregated statistics for the dashboard

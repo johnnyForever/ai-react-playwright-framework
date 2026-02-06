@@ -85,7 +85,7 @@ export class ApiHelper {
     method: string,
     endpoint: string,
     startTime: number,
-    response: APIResponse
+    response: APIResponse,
   ): PerformanceMetrics {
     const metrics: PerformanceMetrics = {
       responseTime: Date.now() - startTime,
@@ -103,7 +103,7 @@ export class ApiHelper {
    */
   async get<T = unknown>(
     endpoint: string,
-    options?: { headers?: Record<string, string> }
+    options?: { headers?: Record<string, string> },
   ): Promise<{ response: APIResponse; data: T; metrics: PerformanceMetrics }> {
     const startTime = Date.now();
     const response = await this.request.get(`${this.baseUrl}${endpoint}`, {
@@ -120,7 +120,7 @@ export class ApiHelper {
   async post<T = unknown>(
     endpoint: string,
     body?: Record<string, unknown>,
-    options?: { headers?: Record<string, string> }
+    options?: { headers?: Record<string, string> },
   ): Promise<{ response: APIResponse; data: T; metrics: PerformanceMetrics }> {
     const startTime = Date.now();
     const response = await this.request.post(`${this.baseUrl}${endpoint}`, {
@@ -138,7 +138,7 @@ export class ApiHelper {
   async put<T = unknown>(
     endpoint: string,
     body?: Record<string, unknown>,
-    options?: { headers?: Record<string, string> }
+    options?: { headers?: Record<string, string> },
   ): Promise<{ response: APIResponse; data: T; metrics: PerformanceMetrics }> {
     const startTime = Date.now();
     const response = await this.request.put(`${this.baseUrl}${endpoint}`, {
@@ -155,7 +155,7 @@ export class ApiHelper {
    */
   async delete<T = unknown>(
     endpoint: string,
-    options?: { headers?: Record<string, string> }
+    options?: { headers?: Record<string, string> },
   ): Promise<{ response: APIResponse; data: T; metrics: PerformanceMetrics }> {
     const startTime = Date.now();
     const response = await this.request.delete(`${this.baseUrl}${endpoint}`, {
@@ -211,15 +211,21 @@ export class ApiHelper {
     const violations: string[] = [];
 
     if (stats.max > thresholds.maxResponseTime) {
-      violations.push(`Max response time ${stats.max}ms exceeds threshold ${thresholds.maxResponseTime}ms`);
+      violations.push(
+        `Max response time ${stats.max}ms exceeds threshold ${thresholds.maxResponseTime}ms`,
+      );
     }
 
     if (thresholds.p95ResponseTime && stats.p95 > thresholds.p95ResponseTime) {
-      violations.push(`P95 response time ${stats.p95}ms exceeds threshold ${thresholds.p95ResponseTime}ms`);
+      violations.push(
+        `P95 response time ${stats.p95}ms exceeds threshold ${thresholds.p95ResponseTime}ms`,
+      );
     }
 
     if (thresholds.p99ResponseTime && stats.p99 > thresholds.p99ResponseTime) {
-      violations.push(`P99 response time ${stats.p99}ms exceeds threshold ${thresholds.p99ResponseTime}ms`);
+      violations.push(
+        `P99 response time ${stats.p99}ms exceeds threshold ${thresholds.p99ResponseTime}ms`,
+      );
     }
 
     return {
@@ -270,7 +276,7 @@ export class ApiHelper {
 export async function loginAndGetToken(
   api: ApiHelper,
   email: string,
-  password: string
+  password: string,
 ): Promise<string> {
   const { data } = await api.post<{ token: string; success: boolean }>('/api/auth/login', {
     email,

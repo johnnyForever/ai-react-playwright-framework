@@ -3,9 +3,9 @@
  * Provides structured logging for tests with automatic DB integration
  */
 
+import type { TestInfo } from '@playwright/test';
 import * as fs from 'fs';
 import * as path from 'path';
-import { TestInfo } from '@playwright/test';
 
 export type LogLevel = 'debug' | 'info' | 'warn' | 'error' | 'step';
 
@@ -32,7 +32,7 @@ export class TestLogger {
   constructor(runId: string, testInfo?: TestInfo) {
     this.runId = runId;
     this.testInfo = testInfo;
-    
+
     // Setup log file
     const logsDir = path.join(process.cwd(), 'test-results', 'logs');
     if (!fs.existsSync(logsDir)) {
@@ -41,7 +41,11 @@ export class TestLogger {
     this.logFilePath = path.join(logsDir, `${runId}.jsonl`);
   }
 
-  private formatMessage(level: LogLevel, message: string, metadata?: Record<string, unknown>): LogMessage {
+  private formatMessage(
+    level: LogLevel,
+    message: string,
+    metadata?: Record<string, unknown>,
+  ): LogMessage {
     const logMessage: LogMessage = {
       timestamp: new Date().toISOString(),
       level,
@@ -50,30 +54,33 @@ export class TestLogger {
       testName: this.testInfo?.title,
       testFile: this.testInfo?.file ? path.basename(this.testInfo.file) : undefined,
       testId: this.testInfo?.testId,
-      stepName: this.stepStack.length > 0 ? this.stepStack[this.stepStack.length - 1].name : undefined,
-      metadata
+      stepName:
+        this.stepStack.length > 0 ? this.stepStack[this.stepStack.length - 1].name : undefined,
+      metadata,
     };
     return logMessage;
   }
 
   private writeLog(logMessage: LogMessage): void {
     this.logs.push(logMessage);
-    
+
     // Console output with colors
     const colors = {
-      debug: '\x1b[90m',  // Gray
-      info: '\x1b[36m',   // Cyan
-      warn: '\x1b[33m',   // Yellow
-      error: '\x1b[31m',  // Red
-      step: '\x1b[35m'    // Magenta
+      debug: '\x1b[90m', // Gray
+      info: '\x1b[36m', // Cyan
+      warn: '\x1b[33m', // Yellow
+      error: '\x1b[31m', // Red
+      step: '\x1b[35m', // Magenta
     };
     const reset = '\x1b[0m';
     const color = colors[logMessage.level];
-    
+
     const prefix = logMessage.testName ? `[${logMessage.testName}]` : '[Global]';
     const stepPrefix = logMessage.stepName ? `[${logMessage.stepName}]` : '';
-    console.log(`${color}[${logMessage.level.toUpperCase()}]${reset} ${prefix}${stepPrefix} ${logMessage.message}`);
-    
+    console.log(
+      `${color}[${logMessage.level.toUpperCase()}]${reset} ${prefix}${stepPrefix} ${logMessage.message}`,
+    );
+
     // Write to file
     if (this.logFilePath) {
       fs.appendFileSync(this.logFilePath, JSON.stringify(logMessage) + '\n');
@@ -119,8 +126,8 @@ export class TestLogger {
       ...(error && {
         errorName: error.name,
         errorMessage: error.message,
-        errorStack: error.stack
-      })
+        errorStack: error.stack,
+      }),
     };
     this.writeLog(this.formatMessage('error', message, meta));
   }
@@ -141,7 +148,11 @@ export class TestLogger {
     if (step) {
       const duration = Date.now() - step.startTime;
       const status = success ? '✓' : '✗';
-      this.writeLog(this.formatMessage('step', `${status} Completed: ${step.name} (${duration}ms)`, { duration }));
+      this.writeLog(
+        this.formatMessage('step', `${status} Completed: ${step.name} (${duration}ms)`, {
+          duration,
+        }),
+      );
     }
   }
 
@@ -169,7 +180,7 @@ export class TestLogger {
       line: this.testInfo?.line,
       column: this.testInfo?.column,
       tags: this.testInfo?.tags,
-      project: this.testInfo?.project.name
+      project: this.testInfo?.project.name,
     });
   }
 
@@ -179,12 +190,15 @@ export class TestLogger {
   testEnd(): void {
     const duration = this.testInfo?.duration || 0;
     const status = this.testInfo?.status || 'unknown';
-    
+
     if (status === 'passed') {
       this.info(`Test passed: ${this.testInfo?.title} (${duration}ms)`, { duration, status });
     } else if (status === 'failed') {
       const error = this.testInfo?.error;
-      this.error(`Test failed: ${this.testInfo?.title} (${duration}ms)`, error as Error, { duration, status });
+      this.error(`Test failed: ${this.testInfo?.title} (${duration}ms)`, error as Error, {
+        duration,
+        status,
+      });
     } else if (status === 'skipped') {
       this.info(`Test skipped: ${this.testInfo?.title}`, { status });
     } else {
@@ -218,14 +232,14 @@ export class TestLogger {
     stepName?: string;
     metadata?: Record<string, unknown>;
   }> {
-    return this.logs.map(log => ({
+    return this.logs.map((log) => ({
       runId: log.runId || this.runId,
       testId: log.testId,
       timestamp: log.timestamp,
       level: log.level,
       message: log.message,
       stepName: log.stepName,
-      metadata: log.metadata
+      metadata: log.metadata,
     }));
   }
 

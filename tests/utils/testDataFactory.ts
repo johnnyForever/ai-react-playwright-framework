@@ -15,7 +15,9 @@ import { randomUUID } from 'crypto';
  * randomString(12) // => "a3b8c9d2e5f1"
  */
 function randomString(length: number = 8): string {
-  return Math.random().toString(36).substring(2, 2 + length);
+  return Math.random()
+    .toString(36)
+    .substring(2, 2 + length);
 }
 
 /**
@@ -114,10 +116,30 @@ export const ProductFactory = {
   /**
    * Get expected sort orders
    */
-  sortedByNameAsc: () => ['Laptop Pro', 'Mechanical Keyboard', 'Smart Watch', 'Wireless Headphones'],
-  sortedByNameDesc: () => ['Wireless Headphones', 'Smart Watch', 'Mechanical Keyboard', 'Laptop Pro'],
-  sortedByPriceAsc: () => ['Mechanical Keyboard', 'Wireless Headphones', 'Smart Watch', 'Laptop Pro'],
-  sortedByPriceDesc: () => ['Laptop Pro', 'Smart Watch', 'Wireless Headphones', 'Mechanical Keyboard'],
+  sortedByNameAsc: () => [
+    'Laptop Pro',
+    'Mechanical Keyboard',
+    'Smart Watch',
+    'Wireless Headphones',
+  ],
+  sortedByNameDesc: () => [
+    'Wireless Headphones',
+    'Smart Watch',
+    'Mechanical Keyboard',
+    'Laptop Pro',
+  ],
+  sortedByPriceAsc: () => [
+    'Mechanical Keyboard',
+    'Wireless Headphones',
+    'Smart Watch',
+    'Laptop Pro',
+  ],
+  sortedByPriceDesc: () => [
+    'Laptop Pro',
+    'Smart Watch',
+    'Wireless Headphones',
+    'Mechanical Keyboard',
+  ],
 
   /**
    * Generate a random product for dynamic tests
@@ -133,7 +155,7 @@ export const ProductFactory = {
   /**
    * Generate multiple random products
    */
-  randomProducts: (count: number) => 
+  randomProducts: (count: number) =>
     Array.from({ length: count }, () => ProductFactory.randomProduct()),
 
   /**
@@ -141,9 +163,7 @@ export const ProductFactory = {
    */
   calculateTotal: (productIds: string[]): number => {
     const products = ProductFactory.testProducts();
-    return products
-      .filter(p => productIds.includes(p.id))
-      .reduce((sum, p) => sum + p.price, 0);
+    return products.filter((p) => productIds.includes(p.id)).reduce((sum, p) => sum + p.price, 0);
   },
 };
 
@@ -204,7 +224,8 @@ export const NumberFactory = {
   /**
    * Generate a random price
    */
-  price: (min: number = 1, max: number = 1000) => parseFloat((Math.random() * (max - min) + min).toFixed(2)),
+  price: (min: number = 1, max: number = 1000) =>
+    parseFloat((Math.random() * (max - min) + min).toFixed(2)),
 
   /**
    * Generate a random quantity

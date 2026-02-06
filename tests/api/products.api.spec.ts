@@ -1,10 +1,12 @@
-import { test, expect } from '../fixtures/api.fixture';
 import { testCredentials } from '../config/credentials';
+import { expect, test } from '../fixtures/api.fixture';
 
 test.describe('Products API @api @regression', () => {
   test.describe('GET /api/products', () => {
     test('should return all products', async ({ api }) => {
-      const { response, data, metrics } = await api.get<{ data: unknown[]; total: number }>('/api/products');
+      const { response, data, metrics } = await api.get<{ data: unknown[]; total: number }>(
+        '/api/products',
+      );
 
       expect(response.status()).toBe(200);
       expect(data.data).toBeInstanceOf(Array);
@@ -14,7 +16,9 @@ test.describe('Products API @api @regression', () => {
     });
 
     test('should return products with correct structure', async ({ api }) => {
-      const { data } = await api.get<{ data: Array<{ id: string; name: string; price: number }> }>('/api/products');
+      const { data } = await api.get<{ data: Array<{ id: string; name: string; price: number }> }>(
+        '/api/products',
+      );
 
       const product = data.data[0];
       expect(product).toHaveProperty('id');
@@ -28,7 +32,9 @@ test.describe('Products API @api @regression', () => {
 
   test.describe('GET /api/products/:id', () => {
     test('should return a single product by ID', async ({ api }) => {
-      const { response, data } = await api.get<{ data: { id: string; name: string } }>('/api/products/1');
+      const { response, data } = await api.get<{ data: { id: string; name: string } }>(
+        '/api/products/1',
+      );
 
       expect(response.status()).toBe(200);
       expect(data.data.id).toBe('1');
@@ -51,9 +57,10 @@ test.describe('Products API @api @regression', () => {
 
   test.describe('Product search', () => {
     test('should search products by name', async ({ api }) => {
-      const { response, data } = await api.get<{ data: Array<{ name: string }>; query: { q: string } }>(
-        '/api/products/search?q=laptop'
-      );
+      const { response, data } = await api.get<{
+        data: Array<{ name: string }>;
+        query: { q: string };
+      }>('/api/products/search?q=laptop');
 
       expect(response.status()).toBe(200);
       expect(data.data.some((p) => p.name.toLowerCase().includes('laptop'))).toBeTruthy();
@@ -61,7 +68,7 @@ test.describe('Products API @api @regression', () => {
 
     test('should filter products by price range', async ({ api }) => {
       const { response, data } = await api.get<{ data: Array<{ price: number }> }>(
-        '/api/products/search?minPrice=100&maxPrice=300'
+        '/api/products/search?minPrice=100&maxPrice=300',
       );
 
       expect(response.status()).toBe(200);
@@ -94,10 +101,10 @@ test.describe('Product CRUD operations @api @regression', () => {
       imageUrl: 'https://picsum.photos/400/300',
     };
 
-    const { response, data } = await api.post<{ data: { id: string; name: string }; message: string }>(
-      '/api/products',
-      newProduct
-    );
+    const { response, data } = await api.post<{
+      data: { id: string; name: string };
+      message: string;
+    }>('/api/products', newProduct);
 
     expect(response.status()).toBe(201);
     expect(data.data.name).toBe(newProduct.name);
@@ -107,7 +114,10 @@ test.describe('Product CRUD operations @api @regression', () => {
   test('should update an existing product (admin only)', async ({ api }) => {
     const updates = { name: 'Updated Product Name' };
 
-    const { response, data } = await api.put<{ data: { name: string }; message: string }>('/api/products/1', updates);
+    const { response, data } = await api.put<{ data: { name: string }; message: string }>(
+      '/api/products/1',
+      updates,
+    );
 
     expect(response.status()).toBe(200);
     expect(data.data.name).toBe(updates.name);

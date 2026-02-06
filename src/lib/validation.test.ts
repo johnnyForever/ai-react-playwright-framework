@@ -1,5 +1,5 @@
-import { describe, it, expect } from 'vitest';
-import { isValidEmail, validateLoginForm, hasErrors } from './validation';
+import { describe, expect, it } from 'vitest';
+import { hasErrors, isValidEmail, validateLoginForm } from './validation';
 
 describe('validation', () => {
   describe('isValidEmail', () => {
@@ -81,7 +81,9 @@ describe('validation', () => {
     });
 
     it('should return true when both errors exist', () => {
-      expect(hasErrors({ email: 'Email is required', password: 'Password is required' })).toBe(true);
+      expect(hasErrors({ email: 'Email is required', password: 'Password is required' })).toBe(
+        true,
+      );
     });
   });
 });

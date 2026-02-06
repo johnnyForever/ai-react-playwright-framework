@@ -3,8 +3,8 @@
  * Generates HTML components for the test dashboard
  */
 
-import type { DashboardData, ChartData, TestRun, TestResult, TestHistory } from './types';
 import { DashboardUtils } from './DashboardUtils';
+import type { ChartData, DashboardData, TestHistory, TestResult, TestRun } from './types';
 
 /**
  * Template engine class responsible for generating all HTML content
@@ -17,7 +17,7 @@ export class HtmlTemplateEngine {
    */
   build(data: DashboardData): string {
     const chartData = this.prepareChartData(data);
-    
+
     return `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -50,8 +50,8 @@ export class HtmlTemplateEngine {
     const recentRuns = data.runs.slice(0, 10).reverse();
     return {
       labels: recentRuns.map((_, i) => `Run ${i + 1}`),
-      passRateTrend: recentRuns.map(r => r.passRate.toFixed(1)),
-      durationTrend: recentRuns.map(r => (r.durationMs / 1000).toFixed(1)),
+      passRateTrend: recentRuns.map((r) => r.passRate.toFixed(1)),
+      durationTrend: recentRuns.map((r) => (r.durationMs / 1000).toFixed(1)),
     };
   }
 
@@ -285,7 +285,7 @@ export class HtmlTemplateEngine {
    */
   private generateStatsGrid(stats: DashboardData['stats']): string {
     const passRateClass = DashboardUtils.getPassRateClass(stats.avgPassRate);
-    
+
     return `
     <div class="stats-grid">
       <div class="stat-card info">
@@ -339,8 +339,8 @@ export class HtmlTemplateEngine {
     </div>`;
     }
 
-    const rows = runs.map(run => this.generateRunRow(run)).join('');
-    
+    const rows = runs.map((run) => this.generateRunRow(run)).join('');
+
     return `
     <div class="section">
       <h2>🕐 Recent Test Runs</h2>
@@ -368,9 +368,10 @@ export class HtmlTemplateEngine {
    */
   private generateRunRow(run: TestRun): string {
     const passRateClass = DashboardUtils.getPassRateClass(run.passRate);
-    const failedDisplay = run.failed > 0 
-      ? `<span class="status failed">✗ ${run.failed}</span>` 
-      : '<span style="color:#666">0</span>';
+    const failedDisplay =
+      run.failed > 0
+        ? `<span class="status failed">✗ ${run.failed}</span>`
+        : '<span style="color:#666">0</span>';
 
     return `
           <tr>
@@ -399,7 +400,7 @@ export class HtmlTemplateEngine {
       return '';
     }
 
-    const rows = failures.map(test => this.generateFailureRow(test)).join('');
+    const rows = failures.map((test) => this.generateFailureRow(test)).join('');
 
     return `
     <div class="section">
@@ -425,12 +426,10 @@ export class HtmlTemplateEngine {
    */
   private generateFailureRow(test: TestResult): string {
     const filename = DashboardUtils.extractFilename(test.testFile);
-    const errorMessage = test.errorMessage 
+    const errorMessage = test.errorMessage
       ? DashboardUtils.escapeHtml(test.errorMessage.split('\n')[0])
       : 'No error message';
-    const fullError = test.errorMessage 
-      ? DashboardUtils.escapeHtml(test.errorMessage)
-      : '';
+    const fullError = test.errorMessage ? DashboardUtils.escapeHtml(test.errorMessage) : '';
 
     return `
           <tr>
@@ -451,7 +450,7 @@ export class HtmlTemplateEngine {
       return '';
     }
 
-    const rows = flakyTests.map(test => this.generateFlakyTestRow(test)).join('');
+    const rows = flakyTests.map((test) => this.generateFlakyTestRow(test)).join('');
 
     return `
     <div class="section">
@@ -500,7 +499,10 @@ export class HtmlTemplateEngine {
       return '';
     }
 
-    const rows = slowestTests.slice(0, 10).map(test => this.generateSlowTestRow(test)).join('');
+    const rows = slowestTests
+      .slice(0, 10)
+      .map((test) => this.generateSlowTestRow(test))
+      .join('');
 
     return `
     <div class="section">

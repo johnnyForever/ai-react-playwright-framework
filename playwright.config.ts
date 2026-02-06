@@ -1,6 +1,6 @@
 import { defineConfig, devices } from '@playwright/test';
-import { STORAGE_STATE_PATH } from './tests/auth/constants';
 import dotenv from 'dotenv';
+import { STORAGE_STATE_PATH } from './tests/auth/constants';
 
 // Load environment variables from .env file
 dotenv.config();
@@ -8,15 +8,15 @@ dotenv.config();
 /**
  * Playwright configuration
  * @see https://playwright.dev/docs/test-configuration
- * 
+ *
  * Test Tags:
  *   @smoke - Critical path tests for quick feedback
  *   @regression - Full test suite
- * 
+ *
  * Run tagged tests:
  *   npx playwright test --grep @smoke
  *   npx playwright test --grep @regression
- * 
+ *
  * Projects:
  *   - setup: Authenticates and saves storage state
  *   - chromium/firefox/webkit: Run tests with pre-authenticated state
@@ -33,10 +33,13 @@ export default defineConfig({
     ['junit', { outputFile: 'test-results/junit.xml' }],
     ['list'],
     // Custom DB reporter for historical test tracking
-    ['./tests/reporters/dbReporter.ts', {
-      environment: process.env.TEST_ENVIRONMENT || 'local',
-      trigger: process.env.TEST_TRIGGER || 'manual'
-    }],
+    [
+      './tests/reporters/dbReporter.ts',
+      {
+        environment: process.env.TEST_ENVIRONMENT || 'local',
+        trigger: process.env.TEST_TRIGGER || 'manual',
+      },
+    ],
   ],
   use: {
     baseURL: 'http://localhost:5173',
@@ -78,7 +81,7 @@ export default defineConfig({
       grep: /@smoke/,
       grepInvert: /login\.spec\.ts/, // Exclude login tests (they run separately)
       dependencies: ['setup'],
-      use: { 
+      use: {
         ...devices['Desktop Chrome'],
         storageState: STORAGE_STATE_PATH,
       },
@@ -90,7 +93,7 @@ export default defineConfig({
       name: 'chromium',
       testIgnore: /login\.spec\.ts/,
       dependencies: ['setup'],
-      use: { 
+      use: {
         ...devices['Desktop Chrome'],
         storageState: STORAGE_STATE_PATH,
       },
@@ -99,7 +102,7 @@ export default defineConfig({
       name: 'webkit',
       testIgnore: /login\.spec\.ts/,
       dependencies: ['setup'],
-      use: { 
+      use: {
         ...devices['Desktop Safari'],
         storageState: STORAGE_STATE_PATH,
       },
@@ -111,7 +114,7 @@ export default defineConfig({
       name: 'mobile-chrome',
       testIgnore: /login\.spec\.ts/,
       dependencies: ['setup'],
-      use: { 
+      use: {
         ...devices['Pixel 7'],
         storageState: STORAGE_STATE_PATH,
       },

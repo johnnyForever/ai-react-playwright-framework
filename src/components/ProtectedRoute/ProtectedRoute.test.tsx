@@ -1,9 +1,8 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { screen } from '@testing-library/react';
-import { render } from '@testing-library/react';
-import { MemoryRouter, Routes, Route } from 'react-router-dom';
-import { ProtectedRoute } from './ProtectedRoute';
+import { render, screen } from '@testing-library/react';
+import { MemoryRouter, Route, Routes } from 'react-router-dom';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import * as authService from '@/services/authService';
+import { ProtectedRoute } from './ProtectedRoute';
 
 // Mock the auth service
 vi.mock('@/services/authService', () => ({
@@ -25,7 +24,7 @@ describe('ProtectedRoute', () => {
             <Route path="/checkout" element={<div data-testid="checkout-page">Checkout</div>} />
           </Route>
         </Routes>
-      </MemoryRouter>
+      </MemoryRouter>,
     );
   };
 

@@ -1,5 +1,5 @@
-import { test, expect } from '../fixtures/api.fixture';
 import { testCredentials } from '../config/credentials';
+import { expect, test } from '../fixtures/api.fixture';
 
 test.describe('Authentication API @api @smoke @regression', () => {
   test.describe('POST /api/auth/login', () => {
@@ -86,7 +86,9 @@ test.describe('Authentication API @api @smoke @regression', () => {
       api.setAuthToken(loginData.token);
 
       // Get current user
-      const { response, data } = await api.get<{ user: { email: string; name: string } }>('/api/auth/me');
+      const { response, data } = await api.get<{ user: { email: string; name: string } }>(
+        '/api/auth/me',
+      );
 
       expect(response.status()).toBe(200);
       expect(data.user.email).toBe(testCredentials.user.email);
@@ -119,7 +121,9 @@ test.describe('Authentication API @api @smoke @regression', () => {
       api.setAuthToken(loginData.token);
 
       // Logout
-      const { response, data } = await api.post<{ success: boolean; message: string }>('/api/auth/logout');
+      const { response, data } = await api.post<{ success: boolean; message: string }>(
+        '/api/auth/logout',
+      );
 
       expect(response.status()).toBe(200);
       expect(data.success).toBe(true);
@@ -143,7 +147,9 @@ test.describe('Authentication API @api @smoke @regression', () => {
       api.setAuthToken(loginData.token);
 
       // Refresh token
-      const { response, data } = await api.post<{ token: string; expiresIn: number }>('/api/auth/refresh');
+      const { response, data } = await api.post<{ token: string; expiresIn: number }>(
+        '/api/auth/refresh',
+      );
 
       expect(response.status()).toBe(200);
       expect(data.token).toBeTruthy();

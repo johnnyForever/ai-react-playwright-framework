@@ -1,4 +1,4 @@
-import { type Page, type Locator } from '@playwright/test';
+import type { Locator, Page } from '@playwright/test';
 import { BasePage } from './BasePage';
 
 /**
@@ -122,7 +122,7 @@ export class LoginPage extends BasePage {
    * Get error message text
    */
   async getErrorMessage(): Promise<string> {
-    return await this.errorMessage.textContent() || '';
+    return (await this.errorMessage.textContent()) || '';
   }
 
   /**
@@ -136,6 +136,6 @@ export class LoginPage extends BasePage {
    * Get page title text
    */
   async getPageTitle(): Promise<string> {
-    return await this.pageTitle.textContent() || '';
+    return (await this.pageTitle.textContent()) || '';
   }
 }

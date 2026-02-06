@@ -1,5 +1,5 @@
-import express from 'express';
 import cors from 'cors';
+import express from 'express';
 import jwt from 'jsonwebtoken';
 import 'dotenv/config';
 
@@ -55,7 +55,8 @@ const products: Product[] = [
   {
     id: '1',
     name: 'Laptop Pro',
-    description: 'High-performance laptop with 16GB RAM, 512GB SSD, and a stunning 15.6" Retina display.',
+    description:
+      'High-performance laptop with 16GB RAM, 512GB SSD, and a stunning 15.6" Retina display.',
     price: 999.99,
     imageUrl: 'https://picsum.photos/seed/laptop/400/300',
   },
@@ -103,22 +104,26 @@ app.use((req, res, next) => {
   const startTime = Date.now();
   // Store start time for performance tracking
   res.locals.startTime = startTime;
-  
+
   // Override json to add response time header before sending
   const originalJson = res.json.bind(res);
-  res.json = function (body) {
+  res.json = (body) => {
     const duration = Date.now() - startTime;
     if (!res.headersSent) {
       res.setHeader('X-Response-Time', `${duration}ms`);
     }
     return originalJson(body);
   };
-  
+
   next();
 });
 
 // Auth middleware
-function authenticateToken(req: AuthenticatedRequest, res: express.Response, next: express.NextFunction) {
+function authenticateToken(
+  req: AuthenticatedRequest,
+  res: express.Response,
+  next: express.NextFunction,
+) {
   const authHeader = req.headers.authorization;
   const token = authHeader?.split(' ')[1];
 
@@ -136,7 +141,11 @@ function authenticateToken(req: AuthenticatedRequest, res: express.Response, nex
 }
 
 // Admin middleware
-function requireAdmin(req: AuthenticatedRequest, res: express.Response, next: express.NextFunction) {
+function requireAdmin(
+  req: AuthenticatedRequest,
+  res: express.Response,
+  next: express.NextFunction,
+) {
   if (req.user?.role !== 'admin') {
     return res.status(403).json({ error: 'Admin access required' });
   }
@@ -167,7 +176,8 @@ app.get('/api/products/search', (req, res) => {
   const maxPrice = parseFloat(req.query.maxPrice as string) || Infinity;
 
   const filtered = products.filter((p) => {
-    const matchesQuery = p.name.toLowerCase().includes(query) || p.description.toLowerCase().includes(query);
+    const matchesQuery =
+      p.name.toLowerCase().includes(query) || p.description.toLowerCase().includes(query);
     const matchesPrice = p.price >= minPrice && p.price <= maxPrice;
     return matchesQuery && matchesPrice;
   });
@@ -275,16 +285,21 @@ app.put('/api/products/:id', authenticateToken, requireAdmin, (req: Authenticate
   res.json({ data: products[productIndex], message: 'Product updated successfully' });
 });
 
-app.delete('/api/products/:id', authenticateToken, requireAdmin, (req: AuthenticatedRequest, res) => {
-  const productIndex = products.findIndex((p) => p.id === req.params.id);
+app.delete(
+  '/api/products/:id',
+  authenticateToken,
+  requireAdmin,
+  (req: AuthenticatedRequest, res) => {
+    const productIndex = products.findIndex((p) => p.id === req.params.id);
 
-  if (productIndex === -1) {
-    return res.status(404).json({ error: 'Product not found' });
-  }
+    if (productIndex === -1) {
+      return res.status(404).json({ error: 'Product not found' });
+    }
 
-  const deleted = products.splice(productIndex, 1)[0];
-  res.json({ data: deleted, message: 'Product deleted successfully' });
-});
+    const deleted = products.splice(productIndex, 1)[0];
+    res.json({ data: deleted, message: 'Product deleted successfully' });
+  },
+);
 
 // Performance test endpoint (artificial delay for testing)
 app.get('/api/performance/slow', (_req, res) => {

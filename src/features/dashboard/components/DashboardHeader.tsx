@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
-import { logout, getCurrentUser } from '@/services/authService';
 import { BasketIcon } from '@/features/basket';
+import { getCurrentUser, logout } from '@/services/authService';
 import './DashboardHeader.css';
 
 export function DashboardHeader(): React.JSX.Element {
@@ -14,7 +14,9 @@ export function DashboardHeader(): React.JSX.Element {
 
   return (
     <header className="dashboard-header" data-testid="dashboard-header">
-      <h1 className="dashboard-header__title" data-testid="dashboard-title">React Demo App</h1>
+      <h1 className="dashboard-header__title" data-testid="dashboard-title">
+        React Demo App
+      </h1>
       <div className="dashboard-header__actions">
         {user && (
           <>

@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import type { Product, SortOption } from '@/types/product';
 import { ProductCard } from './ProductCard';
 import { SortSelector } from './SortSelector';
@@ -28,10 +28,7 @@ function sortProducts(products: Product[], sortOption: SortOption): Product[] {
 export function ProductList({ products }: ProductListProps): React.JSX.Element {
   const [sortOption, setSortOption] = useState<SortOption>('name-asc');
 
-  const sortedProducts = useMemo(
-    () => sortProducts(products, sortOption),
-    [products, sortOption]
-  );
+  const sortedProducts = useMemo(() => sortProducts(products, sortOption), [products, sortOption]);
 
   return (
     <section className="product-list">

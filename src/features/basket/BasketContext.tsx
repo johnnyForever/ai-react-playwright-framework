@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useCallback, useMemo, type ReactNode } from 'react';
+import { createContext, type ReactNode, useCallback, useContext, useMemo, useState } from 'react';
 import type { Product } from '@/types/product';
 
 interface BasketContextType {
@@ -38,7 +38,7 @@ export function BasketProvider({ children }: BasketProviderProps): React.JSX.Ele
     (productId: string): boolean => {
       return items.some((item) => item.id === productId);
     },
-    [items]
+    [items],
   );
 
   const getBasketCount = useCallback((): number => {
@@ -63,7 +63,7 @@ export function BasketProvider({ children }: BasketProviderProps): React.JSX.Ele
       getBasketTotal,
       clearBasket,
     }),
-    [items, addToBasket, removeFromBasket, isInBasket, getBasketCount, getBasketTotal, clearBasket]
+    [items, addToBasket, removeFromBasket, isInBasket, getBasketCount, getBasketTotal, clearBasket],
   );
 
   return <BasketContext.Provider value={value}>{children}</BasketContext.Provider>;

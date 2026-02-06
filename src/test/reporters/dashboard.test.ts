@@ -3,10 +3,16 @@
  * Tests for DashboardUtils, DashboardDataService, HtmlTemplateEngine, and DashboardGenerator
  */
 
-import { describe, it, expect, beforeEach } from 'vitest';
+import { beforeEach, describe, expect, it } from 'vitest';
 import { DashboardUtils } from '../../../tests/reporters/dashboard/DashboardUtils';
 import { HtmlTemplateEngine } from '../../../tests/reporters/dashboard/HtmlTemplateEngine';
-import type { DashboardData, DashboardStats, TestRun, TestResult, TestHistory } from '../../../tests/reporters/dashboard/types';
+import type {
+  DashboardData,
+  DashboardStats,
+  TestHistory,
+  TestResult,
+  TestRun,
+} from '../../../tests/reporters/dashboard/types';
 
 describe('DashboardUtils', () => {
   describe('formatDuration', () => {
@@ -102,7 +108,7 @@ describe('HtmlTemplateEngine', () => {
 
   beforeEach(() => {
     engine = new HtmlTemplateEngine();
-    
+
     const mockStats: DashboardStats = {
       totalRuns: 10,
       totalTests: 100,
@@ -188,7 +194,7 @@ describe('HtmlTemplateEngine', () => {
   describe('build', () => {
     it('should generate valid HTML document', () => {
       const html = engine.build(mockData);
-      
+
       expect(html).toContain('<!DOCTYPE html>');
       expect(html).toContain('<html lang="en">');
       expect(html).toContain('</html>');
@@ -201,7 +207,7 @@ describe('HtmlTemplateEngine', () => {
 
     it('should include statistics', () => {
       const html = engine.build(mockData);
-      
+
       expect(html).toContain('10'); // totalRuns
       expect(html).toContain('100'); // totalTests
       expect(html).toContain('95.5%'); // avgPassRate
@@ -209,14 +215,14 @@ describe('HtmlTemplateEngine', () => {
 
     it('should include test runs table', () => {
       const html = engine.build(mockData);
-      
+
       expect(html).toContain('test-run'); // partial runId
       expect(html).toContain('96.0%'); // passRate
     });
 
     it('should include failures section when there are failures', () => {
       const html = engine.build(mockData);
-      
+
       expect(html).toContain('Latest Failures');
       expect(html).toContain('should handle login');
       expect(html).toContain('Expected true to be false');
@@ -224,7 +230,7 @@ describe('HtmlTemplateEngine', () => {
 
     it('should include flaky tests section', () => {
       const html = engine.build(mockData);
-      
+
       expect(html).toContain('Flaky Tests');
       expect(html).toContain('should sometimes pass');
       expect(html).toContain('25.0%'); // flakinessScore
@@ -232,7 +238,7 @@ describe('HtmlTemplateEngine', () => {
 
     it('should include slowest tests section', () => {
       const html = engine.build(mockData);
-      
+
       expect(html).toContain('Slowest Tests');
       expect(html).toContain('slow integration test');
     });
@@ -240,14 +246,14 @@ describe('HtmlTemplateEngine', () => {
     it('should show empty state when no runs', () => {
       mockData.runs = [];
       const html = engine.build(mockData);
-      
+
       expect(html).toContain('No test runs yet');
     });
 
     it('should not include failures section when empty', () => {
       mockData.latestFailures = [];
       const html = engine.build(mockData);
-      
+
       expect(html).not.toContain('Latest Failures');
     });
   });

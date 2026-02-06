@@ -1,7 +1,7 @@
-import { describe, it, expect } from 'vitest';
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { renderWithBasket, createMockProduct } from '@/test/testUtils';
+import { describe, expect, it } from 'vitest';
+import { createMockProduct, renderWithBasket } from '@/test/testUtils';
 import { ProductCard } from './ProductCard';
 
 describe('ProductCard', () => {
@@ -49,10 +49,7 @@ describe('ProductCard', () => {
     it('should have link to product detail page', () => {
       renderWithBasket(<ProductCard product={mockProduct} />);
 
-      expect(screen.getByTestId('product-link-1')).toHaveAttribute(
-        'href',
-        '/dashboard/product/1'
-      );
+      expect(screen.getByTestId('product-link-1')).toHaveAttribute('href', '/dashboard/product/1');
     });
 
     it('should have image link to product detail page', () => {
@@ -60,7 +57,7 @@ describe('ProductCard', () => {
 
       expect(screen.getByTestId('product-image-link-1')).toHaveAttribute(
         'href',
-        '/dashboard/product/1'
+        '/dashboard/product/1',
       );
     });
   });
@@ -88,7 +85,7 @@ describe('ProductCard', () => {
       renderWithBasket(<ProductCard product={mockProduct} />);
 
       const button = screen.getByTestId('product-basket-btn-1');
-      
+
       // Add to basket
       await user.click(button);
       expect(button).toHaveTextContent('Remove from Basket');

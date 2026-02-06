@@ -1,15 +1,15 @@
-import { describe, it, expect } from 'vitest';
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { renderWithBasket, createMockProduct } from '@/test/testUtils';
-import { ProductList } from './ProductList';
+import { describe, expect, it } from 'vitest';
+import { createMockProduct, renderWithBasket } from '@/test/testUtils';
 import type { Product } from '@/types/product';
+import { ProductList } from './ProductList';
 
 describe('ProductList', () => {
   const mockProducts: Product[] = [
-    createMockProduct({ id: '1', name: 'Apple', price: 1.50 }),
+    createMockProduct({ id: '1', name: 'Apple', price: 1.5 }),
     createMockProduct({ id: '2', name: 'Banana', price: 0.75 }),
-    createMockProduct({ id: '3', name: 'Cherry', price: 3.00 }),
+    createMockProduct({ id: '3', name: 'Cherry', price: 3.0 }),
     createMockProduct({ id: '4', name: 'Date', price: 2.25 }),
   ];
 
@@ -55,7 +55,7 @@ describe('ProductList', () => {
 
       const grid = screen.getByTestId('product-grid');
       const productNames = Array.from(grid.querySelectorAll('[data-testid^="product-link-"]')).map(
-        (el) => el.textContent
+        (el) => el.textContent,
       );
 
       expect(productNames).toEqual(['Apple', 'Banana', 'Cherry', 'Date']);
@@ -70,7 +70,7 @@ describe('ProductList', () => {
 
       const grid = screen.getByTestId('product-grid');
       const productNames = Array.from(grid.querySelectorAll('[data-testid^="product-link-"]')).map(
-        (el) => el.textContent
+        (el) => el.textContent,
       );
 
       expect(productNames).toEqual(['Date', 'Cherry', 'Banana', 'Apple']);
@@ -85,7 +85,7 @@ describe('ProductList', () => {
 
       const grid = screen.getByTestId('product-grid');
       const productNames = Array.from(grid.querySelectorAll('[data-testid^="product-link-"]')).map(
-        (el) => el.textContent
+        (el) => el.textContent,
       );
 
       // Banana ($0.75) < Apple ($1.50) < Date ($2.25) < Cherry ($3.00)
@@ -101,7 +101,7 @@ describe('ProductList', () => {
 
       const grid = screen.getByTestId('product-grid');
       const productNames = Array.from(grid.querySelectorAll('[data-testid^="product-link-"]')).map(
-        (el) => el.textContent
+        (el) => el.textContent,
       );
 
       // Cherry ($3.00) > Date ($2.25) > Apple ($1.50) > Banana ($0.75)
@@ -119,13 +119,11 @@ describe('ProductList', () => {
       // Add a new expensive product
       const newProducts = [
         ...mockProducts,
-        createMockProduct({ id: '5', name: 'Elderberry', price: 5.00 }),
+        createMockProduct({ id: '5', name: 'Elderberry', price: 5.0 }),
       ];
-      
+
       // Re-render with new products
-      rerender(
-        <ProductList products={newProducts} />
-      );
+      rerender(<ProductList products={newProducts} />);
 
       // Note: After rerender, we need to check the component maintains state
       // But since useState resets, the default sort will apply

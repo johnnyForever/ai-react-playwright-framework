@@ -3,21 +3,21 @@
  * Re-exports all dashboard classes and provides CLI entry point
  */
 
+export { DashboardDataService } from './DashboardDataService';
 // Export all classes
 export { DashboardGenerator } from './DashboardGenerator';
-export { DashboardDataService } from './DashboardDataService';
-export { HtmlTemplateEngine } from './HtmlTemplateEngine';
 export { DashboardUtils } from './DashboardUtils';
+export { HtmlTemplateEngine } from './HtmlTemplateEngine';
 
 // Export all types
-export type { 
-  DashboardData, 
-  DashboardConfig, 
-  DashboardStats, 
+export type {
   ChartData,
-  TestRun,
+  DashboardConfig,
+  DashboardData,
+  DashboardStats,
+  TestHistory,
   TestResult,
-  TestHistory 
+  TestRun,
 } from './types';
 
 // Default export is the main generator

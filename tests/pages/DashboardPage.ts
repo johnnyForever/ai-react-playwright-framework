@@ -1,4 +1,4 @@
-import { type Page, type Locator } from '@playwright/test';
+import type { Locator, Page } from '@playwright/test';
 import { BasePage } from './BasePage';
 
 /**
@@ -58,7 +58,7 @@ export class DashboardPage extends BasePage {
    * Get user email from header
    */
   async getUserEmail(): Promise<string> {
-    return await this.userEmail.textContent() || '';
+    return (await this.userEmail.textContent()) || '';
   }
 
   /**
@@ -114,7 +114,7 @@ export class DashboardPage extends BasePage {
    * Get product price by ID
    */
   async getProductPrice(id: string): Promise<string> {
-    return await this.page.getByTestId(`product-price-${id}`).textContent() || '';
+    return (await this.page.getByTestId(`product-price-${id}`).textContent()) || '';
   }
 
   /**
@@ -124,7 +124,9 @@ export class DashboardPage extends BasePage {
     const button = this.page.getByTestId(`product-basket-btn-${id}`);
     await button.click();
     // Wait for the button text to change to "Remove from Basket" confirming state update
-    await button.filter({ hasText: 'Remove from Basket' }).waitFor({ state: 'visible', timeout: 5000 });
+    await button
+      .filter({ hasText: 'Remove from Basket' })
+      .waitFor({ state: 'visible', timeout: 5000 });
   }
 
   /**
@@ -141,7 +143,7 @@ export class DashboardPage extends BasePage {
    * Get basket button text for product by ID
    */
   async getBasketButtonText(id: string): Promise<string> {
-    return await this.page.getByTestId(`product-basket-btn-${id}`).textContent() || '';
+    return (await this.page.getByTestId(`product-basket-btn-${id}`).textContent()) || '';
   }
 
   /**

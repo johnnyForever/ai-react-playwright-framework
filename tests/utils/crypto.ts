@@ -16,15 +16,21 @@ const SALT_LENGTH = 32;
  */
 function getEncryptionKey(): Buffer {
   const envKey = process.env.ENCRYPTION_KEY;
-  
+
   if (envKey) {
     // If key is provided, derive a proper 32-byte key using PBKDF2
     return crypto.pbkdf2Sync(envKey, 'playwright-test-salt', 100000, 32, 'sha256');
   }
-  
+
   // Development fallback - NOT for production use
   console.warn('⚠️  Using default encryption key. Set ENCRYPTION_KEY for production.');
-  return crypto.pbkdf2Sync('dev-default-key-not-for-production', 'playwright-test-salt', 100000, 32, 'sha256');
+  return crypto.pbkdf2Sync(
+    'dev-default-key-not-for-production',
+    'playwright-test-salt',
+    100000,
+    32,
+    'sha256',
+  );
 }
 
 /**
@@ -35,14 +41,14 @@ function getEncryptionKey(): Buffer {
 export function encrypt(plaintext: string): string {
   const key = getEncryptionKey();
   const iv = crypto.randomBytes(IV_LENGTH);
-  
+
   const cipher = crypto.createCipheriv(ALGORITHM, key, iv);
-  
+
   let encrypted = cipher.update(plaintext, 'utf8', 'base64');
   encrypted += cipher.final('base64');
-  
+
   const authTag = cipher.getAuthTag();
-  
+
   // Format: iv:authTag:ciphertext
   return `${iv.toString('base64')}:${authTag.toString('base64')}:${encrypted}`;
 }
@@ -55,21 +61,21 @@ export function encrypt(plaintext: string): string {
 export function decrypt(encryptedData: string): string {
   const key = getEncryptionKey();
   const parts = encryptedData.split(':');
-  
+
   if (parts.length !== 3) {
     throw new Error('Invalid encrypted data format. Expected iv:authTag:ciphertext');
   }
-  
+
   const [ivBase64, authTagBase64, ciphertext] = parts;
   const iv = Buffer.from(ivBase64, 'base64');
   const authTag = Buffer.from(authTagBase64, 'base64');
-  
+
   const decipher = crypto.createDecipheriv(ALGORITHM, key, iv);
   decipher.setAuthTag(authTag);
-  
+
   let decrypted = decipher.update(ciphertext, 'base64', 'utf8');
   decrypted += decipher.final('utf8');
-  
+
   return decrypted;
 }
 

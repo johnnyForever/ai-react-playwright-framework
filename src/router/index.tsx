@@ -1,7 +1,15 @@
 import { createBrowserRouter, Navigate } from 'react-router-dom';
 import { App } from '@/App';
-import { LoginPage, AdminPage, DashboardPage, ProductDetailPage, ForgotPasswordPage, CheckoutPage, OrderConfirmationPage } from '@/pages';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
+import {
+  AdminPage,
+  CheckoutPage,
+  DashboardPage,
+  ForgotPasswordPage,
+  LoginPage,
+  OrderConfirmationPage,
+  ProductDetailPage,
+} from '@/pages';
 
 export const router = createBrowserRouter([
   {

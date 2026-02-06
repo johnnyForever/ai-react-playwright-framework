@@ -111,11 +111,11 @@ export class TestDatabase {
     }
 
     this.db = new Database(this.dbPath);
-    
+
     // Disable foreign key enforcement to avoid issues with parallel test execution
     // We maintain data integrity programmatically (always insert run before results)
     this.db.pragma('foreign_keys = OFF');
-    
+
     // Use DELETE journal mode in CI for better compatibility, WAL locally for performance
     const isCI = process.env.CI === 'true';
     if (isCI) {
@@ -125,7 +125,7 @@ export class TestDatabase {
     } else {
       this.db.pragma('journal_mode = WAL');
     }
-    
+
     this.initSchema();
   }
 
@@ -196,7 +196,7 @@ export class TestDatabase {
   getRecentTestRuns(limit = 10): TestRun[] {
     const stmt = this.db.prepare(queries.SELECT_RECENT_RUNS);
     const rows = stmt.all(limit) as Record<string, unknown>[];
-    return rows.map(row => this.mapToTestRun(row));
+    return rows.map((row) => this.mapToTestRun(row));
   }
 
   // ===========================================================================
@@ -227,13 +227,13 @@ export class TestDatabase {
   getTestResults(runId: string): TestResult[] {
     const stmt = this.db.prepare(queries.SELECT_RESULTS_BY_RUN);
     const rows = stmt.all(runId) as Record<string, unknown>[];
-    return rows.map(row => this.mapToTestResult(row));
+    return rows.map((row) => this.mapToTestResult(row));
   }
 
   getFailedTests(runId: string): TestResult[] {
     const stmt = this.db.prepare(queries.SELECT_FAILED_TESTS_BY_RUN);
     const rows = stmt.all(runId) as Record<string, unknown>[];
-    return rows.map(row => this.mapToTestResult(row));
+    return rows.map((row) => this.mapToTestResult(row));
   }
 
   // ===========================================================================
@@ -241,7 +241,9 @@ export class TestDatabase {
   // ===========================================================================
 
   updateTestHistory(result: TestResult): void {
-    const existing = this.db.prepare(queries.SELECT_HISTORY_BY_TEST_ID).get(result.testId) as Record<string, unknown> | undefined;
+    const existing = this.db.prepare(queries.SELECT_HISTORY_BY_TEST_ID).get(result.testId) as
+      | Record<string, unknown>
+      | undefined;
 
     const params = {
       testId: result.testId,
@@ -278,19 +280,19 @@ export class TestDatabase {
   getFlakyTests(limit = 10): TestHistory[] {
     const stmt = this.db.prepare(queries.SELECT_FLAKY_TESTS);
     const rows = stmt.all(limit) as Record<string, unknown>[];
-    return rows.map(row => this.mapToTestHistory(row));
+    return rows.map((row) => this.mapToTestHistory(row));
   }
 
   getSlowestTests(limit = 10): TestHistory[] {
     const stmt = this.db.prepare(queries.SELECT_SLOWEST_TESTS);
     const rows = stmt.all(limit) as Record<string, unknown>[];
-    return rows.map(row => this.mapToTestHistory(row));
+    return rows.map((row) => this.mapToTestHistory(row));
   }
 
   getMostFailingTests(limit = 10): TestHistory[] {
     const stmt = this.db.prepare(queries.SELECT_MOST_FAILING_TESTS);
     const rows = stmt.all(limit) as Record<string, unknown>[];
-    return rows.map(row => this.mapToTestHistory(row));
+    return rows.map((row) => this.mapToTestHistory(row));
   }
 
   getOverallStats(): OverallStats {
@@ -340,7 +342,7 @@ export class TestDatabase {
   checkpoint(): void {
     // Check current journal mode
     const journalMode = this.db.pragma('journal_mode', { simple: true }) as string;
-    
+
     // Only checkpoint if using WAL mode
     if (journalMode.toLowerCase() === 'wal') {
       this.db.pragma('wal_checkpoint(TRUNCATE)');

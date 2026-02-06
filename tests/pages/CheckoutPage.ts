@@ -1,4 +1,4 @@
-import { type Page, type Locator } from '@playwright/test';
+import type { Locator, Page } from '@playwright/test';
 import { BasePage } from './BasePage';
 
 /**
@@ -110,7 +110,10 @@ export class CheckoutPage extends BasePage {
   async getItemCount(): Promise<number> {
     // Wait for checkout items to appear in the DOM
     const itemLocator = this.page.locator('article[data-testid^="checkout-item-"]');
-    await itemLocator.first().waitFor({ state: 'attached', timeout: 5000 }).catch(() => null);
+    await itemLocator
+      .first()
+      .waitFor({ state: 'attached', timeout: 5000 })
+      .catch(() => null);
     return await itemLocator.count();
   }
 
