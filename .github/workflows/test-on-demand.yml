@@ -83,10 +83,15 @@ jobs:
       
       - name: 🎭 Install Playwright browsers
         run: |
-          if [ "${{ inputs.browser }}" = "all" ]; then
+          # Map project names to browser installation targets
+          # mobile-chrome project uses chromium browser
+          BROWSER="${{ inputs.browser }}"
+          if [ "$BROWSER" = "all" ]; then
             npx playwright install --with-deps
+          elif [ "$BROWSER" = "mobile-chrome" ]; then
+            npx playwright install --with-deps chromium
           else
-            npx playwright install --with-deps ${{ inputs.browser }}
+            npx playwright install --with-deps $BROWSER
           fi
       
       - name: 🏗️ Build application
