@@ -365,10 +365,19 @@ npx ts-node tests/scripts/generateDashboard.ts help
 
 ## CI/CD Pipelines
 
+### Test Results in GitHub UI
+
+Both pipelines publish JUnit test results directly to GitHub Actions using `dorny/test-reporter`. After each run, you'll see:
+
+- **Check run** with test summary (passed/failed/skipped counts)
+- **Clickable test names** linking to failure details
+- **Error messages** displayed inline for failed tests
+
 ### On PR Merge (`test-on-merge.yml`)
 
 Automatically runs all tests when a PR is merged to main:
 - Runs full regression suite
+- Publishes JUnit results to GitHub Actions UI
 - Generates test dashboard
 - Uploads artifacts (reports, screenshots)
 - Comments on commit if tests fail
@@ -381,6 +390,7 @@ Manual workflow dispatch with configurable options:
 - **Environment**: local, staging, production
 - **Retries**: 0-3
 - **Debug mode**: Enable traces on all tests
+- **JUnit publishing**: Results visible in GitHub Actions UI
 
 ## Configuration
 
@@ -404,8 +414,10 @@ Key settings in `playwright.config.ts`:
   testDir: './tests/e2e',
   retries: process.env.CI ? 2 : 0,
   reporter: [
-    ['html'],
-    ['./tests/reporters/dbReporter.ts'],  // Custom DB reporter
+    ['html'],                              // Interactive HTML report
+    ['junit', { outputFile: 'test-results/junit.xml' }],  // For CI integration
+    ['list'],                              // Console output
+    ['./tests/reporters/dbReporter.ts'],   // Custom DB reporter for analytics
   ],
   projects: [
     { name: 'smoke', grep: /@smoke/ },    // Quick smoke tests

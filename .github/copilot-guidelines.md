@@ -256,7 +256,7 @@ On failure:
 * HTML report generated per run
 * Reports are not committed
 * Stored per execution
-* JUnit for CI integration
+* JUnit XML for CI integration (published to GitHub Actions UI via `dorny/test-reporter`)
 * Custom HTML dashboard for analytics
 * API performance reports with metrics
 
@@ -269,8 +269,10 @@ Pipeline steps:
 1. Install dependencies
 2. Run static analysis
 3. Execute tests (unit, API, E2E)
-4. Publish reports
-5. Archive logs
+4. Publish JUnit results to GitHub Actions UI
+5. Generate test dashboard
+6. Upload artifacts (reports, screenshots)
+7. Archive logs
 
 ---
 
