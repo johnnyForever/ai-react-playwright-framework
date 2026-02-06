@@ -11,8 +11,8 @@ on:
         type: choice
         options:
           - chromium
-          - firefox
           - webkit
+          - mobile-chrome
           - all
       
       tags:

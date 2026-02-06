@@ -401,7 +401,7 @@ Automatically runs all tests when a PR is merged to main:
 ### On Demand (`test-on-demand.yml`)
 
 Manual workflow dispatch with configurable options:
-- **Browser**: chromium, firefox, webkit, or all
+- **Browser**: chromium, webkit, mobile-chrome, or all
 - **Tags**: @smoke, @regression, or all
 - **Environment**: local, staging, production
 - **Retries**: 0-3
