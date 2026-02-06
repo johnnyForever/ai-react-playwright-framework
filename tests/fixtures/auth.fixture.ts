@@ -19,7 +19,8 @@ interface AuthFixtures {
 }
 
 export const test = base.extend<AuthFixtures>({
-  logger: async (_deps, use, testInfo) => {
+  // eslint-disable-next-line no-empty-pattern
+  logger: async ({}, use, testInfo) => {
     // Create logger for this test
     const logger = createLogger(RUN_ID, testInfo);
     logger.testStart();

@@ -5,7 +5,7 @@
 This project includes a comprehensive testing strategy with **unit tests**, **E2E tests**, and **API tests**:
 
 ### Unit Testing (Vitest + React Testing Library)
-- **149 unit tests** covering components, hooks, services, and utilities
+- **173 unit tests** covering components, hooks, services, and utilities
 - Fast feedback loop with watch mode
 - Component testing with React Testing Library
 - Mock utilities for isolated testing
@@ -142,10 +142,18 @@ src/
 tests/
 ├── api/                   # API test specifications
 │   ├── auth.api.spec.ts   # Auth API tests (14 tests)
-│   ├── products.api.spec.ts # Products API tests (14 tests)
-│   └── performance.api.spec.ts # Performance tests (12 tests)
+│   ├── products.api.spec.ts # Products API tests (11 tests)
+│   └── performance.api.spec.ts # Performance tests (15 tests)
+├── auth/                  # Authentication setup
+│   ├── auth.setup.ts      # Storage state setup
+│   └── constants.ts       # Auth constants
+├── config/                # Test configuration
+│   └── credentials.ts     # Credential helpers
+├── data/                  # Test data
+│   └── credentials.ts     # Test credentials
 ├── db/                    # Database layer
 │   ├── database.ts        # SQLite wrapper
+│   ├── queries.ts         # SQL queries
 │   └── schema.sql         # Database schema
 ├── e2e/                   # E2E test specifications
 │   ├── login.spec.ts      # Login feature tests
@@ -156,18 +164,26 @@ tests/
 │   ├── api.fixture.ts     # API test fixture
 │   └── testData.ts        # Test data
 ├── pages/                 # Page Object Models
+│   ├── BasePage.ts        # Base page class
 │   ├── LoginPage.ts
 │   ├── DashboardPage.ts
 │   ├── ProductDetailPage.ts
-│   └── CheckoutPage.ts
+│   ├── CheckoutPage.ts
+│   └── index.ts           # Page exports
 ├── reporters/             # Custom reporters
 │   ├── dbReporter.ts      # Database reporter
-│   └── dashboardGenerator.ts
+│   ├── dashboardGenerator.ts
+│   └── dashboard/         # Dashboard modules
+│       ├── DashboardGenerator.ts
+│       ├── DashboardDataService.ts
+│       ├── HtmlTemplateEngine.ts
+│       └── types.ts
 ├── scripts/               # CLI utilities
 │   └── generateDashboard.ts
 └── utils/                 # Utilities
     ├── logger.ts          # Custom logger
     ├── apiHelpers.ts      # API testing utilities
+    ├── crypto.ts          # Encryption utilities
     └── testDataFactory.ts # Test data factory
 ```
 
@@ -420,10 +436,13 @@ Key settings in `playwright.config.ts`:
     ['./tests/reporters/dbReporter.ts'],   // Custom DB reporter for analytics
   ],
   projects: [
+    { name: 'api' },                      // API tests (no browser)
+    { name: 'setup' },                    // Auth setup
+    { name: 'chromium-no-auth' },         // Login tests
     { name: 'smoke', grep: /@smoke/ },    // Quick smoke tests
-    { name: 'chromium' },
-    { name: 'firefox' },
-    { name: 'webkit' },
+    { name: 'chromium' },                 // Desktop Chrome
+    { name: 'webkit' },                   // Desktop Safari
+    { name: 'mobile-chrome' },            // Mobile Chrome (Pixel 7)
   ],
 }
 ```
@@ -442,7 +461,7 @@ Key settings in `playwright.config.ts`:
 
 | Feature | Value |
 |---------|-------|
-| Unit tests (149) | Instant feedback on component changes |
+| Unit tests (173) | Instant feedback on component changes |
 | API tests (40) | Validate backend contracts and performance |
 | Performance metrics | Track response times (p50, p95, p99) |
 | Stress tests | Ensure stability under load |
