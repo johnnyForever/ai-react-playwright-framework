@@ -135,6 +135,15 @@ jobs:
           VITE_ADMIN_EMAIL: ${{ secrets.TEST_ADMIN_EMAIL }}
           VITE_ADMIN_PASSWORD: ${{ secrets.TEST_ADMIN_PASSWORD }}
       
+      - name: 📋 Publish Test Results
+        uses: dorny/test-reporter@v1
+        if: always()
+        with:
+          name: Playwright Test Results (${{ inputs.browser }})
+          path: test-results/junit.xml
+          reporter: java-junit
+          fail-on-error: false
+      
       - name: 🔍 Debug - List test artifacts
         if: always()
         run: |
