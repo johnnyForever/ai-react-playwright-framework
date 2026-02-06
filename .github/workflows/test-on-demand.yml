@@ -52,6 +52,11 @@ on:
         default: false
         type: boolean
 
+# Permissions required for test results publishing
+permissions:
+  contents: read
+  checks: write
+
 env:
   NODE_VERSION: '20'
   TEST_ENVIRONMENT: ${{ inputs.environment }}
