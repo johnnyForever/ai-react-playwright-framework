@@ -1,10 +1,18 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useBasket } from '@/features/basket';
 import './OrderConfirmation.css';
 
+// Generate order number outside component to avoid React purity rules
+function generateOrderNumber(): string {
+  return Math.random().toString(36).substring(2, 10).toUpperCase();
+}
+
 export function OrderConfirmation(): React.JSX.Element {
   const { clearBasket } = useBasket();
+
+  // Store order number in state - initialized once via lazy initializer
+  const [orderNumber] = useState(generateOrderNumber);
 
   // Clear basket when order is confirmed
   useEffect(() => {
@@ -42,9 +50,7 @@ export function OrderConfirmation(): React.JSX.Element {
         <div className="order-confirmation__details">
           <div className="order-confirmation__detail-row">
             <span>Order Number:</span>
-            <span data-testid="order-number">
-              #{Math.random().toString(36).substring(2, 10).toUpperCase()}
-            </span>
+            <span data-testid="order-number">#{orderNumber}</span>
           </div>
           <div className="order-confirmation__detail-row">
             <span>Estimated Delivery:</span>

@@ -14,7 +14,6 @@ export const test = base.extend<{
 
   api: async ({ request }, use) => {
     const api = new ApiHelper(request, API_BASE_URL);
-    // eslint-disable-next-line react-hooks/rules-of-hooks
     await use(api);
 
     // Log performance report after each test
