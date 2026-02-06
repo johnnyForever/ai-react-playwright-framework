@@ -25,10 +25,6 @@
     "test:dashboard": "npx tsx tests/scripts/generateDashboard.ts dashboard",
     "test:stats": "npx tsx tests/scripts/generateDashboard.ts stats",
     "test:flaky": "npx tsx tests/scripts/generateDashboard.ts flaky",
-    "allure:generate": "allure generate allure-results --clean -o allure-report",
-    "allure:open": "allure open allure-report",
-    "allure:serve": "allure serve allure-results",
-    "report:allure": "npx serve allure-report -p 4000",
     "report:dashboard": "npm run test:dashboard"
   },
   "dependencies": {
@@ -59,8 +55,6 @@
     "@types/uuid": "^10.0.0",
     "@vitejs/plugin-react": "^5.1.1",
     "@vitest/ui": "^4.0.18",
-    "allure-commandline": "^2.36.0",
-    "allure-playwright": "^3.4.5",
     "docx": "^9.5.1",
     "eslint": "^9.39.1",
     "eslint-plugin-react-hooks": "^7.0.1",

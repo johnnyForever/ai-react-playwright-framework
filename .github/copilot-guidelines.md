@@ -65,7 +65,7 @@ Added progressively to show evolution:
 * API Testing: **Playwright APIRequestContext with custom helpers**
 * Performance Testing: **Response time metrics (p50, p95, p99)**
 * Assertion Library: **Playwright expect**
-* Reporting: **HTML + JUnit + Allure**
+* Reporting: **HTML + JUnit + Custom Dashboard**
 * CI/CD: **YAML*based pipeline**
 
 ### 1.4 Tooling
@@ -256,7 +256,8 @@ On failure:
 * HTML report generated per run
 * Reports are not committed
 * Stored per execution
-* JUnit & Allure for CI integration
+* JUnit for CI integration
+* Custom HTML dashboard for analytics
 * API performance reports with metrics
 
 ---

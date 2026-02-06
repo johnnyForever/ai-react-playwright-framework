@@ -32,8 +32,6 @@ test-results/
 *.db
 *.db-wal
 *.db-shm
-allure-results/
-allure-report/
 .auth/
 
 # Environment

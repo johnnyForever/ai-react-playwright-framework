@@ -32,17 +32,6 @@ export default defineConfig({
     ['html', { outputFolder: 'playwright-report' }],
     ['junit', { outputFile: 'test-results/junit.xml' }],
     ['list'],
-    // Allure reporter for rich test reporting
-    ['allure-playwright', {
-      outputFolder: 'allure-results',
-      suiteTitle: true,
-      categories: [
-        { name: 'Passed', matchedStatuses: ['passed'] },
-        { name: 'Failed', matchedStatuses: ['failed'] },
-        { name: 'Broken', matchedStatuses: ['broken'] },
-        { name: 'Skipped', matchedStatuses: ['skipped'] },
-      ],
-    }],
     // Custom DB reporter for historical test tracking
     ['./tests/reporters/dbReporter.ts', {
       environment: process.env.TEST_ENVIRONMENT || 'local',

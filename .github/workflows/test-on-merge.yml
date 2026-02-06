@@ -59,12 +59,11 @@ jobs:
       - name: 🔍 Debug - List test artifacts
         if: always()
         run: |
-          echo "=== Allure Results ==="
-          ls -la allure-results/ 2>/dev/null | head -20 || echo "allure-results folder not found"
-          echo "Result files count: $(ls allure-results/*-result.json 2>/dev/null | wc -l)"
-          echo ""
           echo "=== Test Results ==="
           ls -la test-results/ 2>/dev/null || echo "test-results folder not found"
+          echo ""
+          echo "=== Playwright Report ==="
+          ls -la playwright-report/ 2>/dev/null || echo "playwright-report folder not found"
           echo ""
           echo "=== Database file check ==="
           if [ -f ".test-db/test-analytics.db" ]; then
@@ -82,16 +81,6 @@ jobs:
         if: always()
         run: npx tsx tests/scripts/generateDashboard.ts dashboard
       
-      - name: 📈 Generate Allure report
-        if: always()
-        run: |
-          echo "Installing Allure CLI..."
-          npm install -g allure-commandline --save-dev 2>/dev/null || true
-          echo "Generating Allure report..."
-          npx allure generate allure-results --clean -o allure-report || echo "Allure generation failed"
-          echo "=== Allure Report Generated ==="
-          ls -la allure-report/ 2>/dev/null | head -10 || echo "allure-report folder not created"
-      
       - name: 📤 Upload Playwright report
         uses: actions/upload-artifact@v4
         if: always()
@@ -100,22 +89,12 @@ jobs:
           path: playwright-report/
           retention-days: 30
       
-      - name: 📤 Upload Allure report
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: allure-report
-          path: allure-report/
-          retention-days: 30
-      
       - name: 📤 Upload test results
         uses: actions/upload-artifact@v4
         if: always()
         with:
           name: test-results
-          path: |
-            test-results/
-            allure-results/
+          path: test-results/
           retention-days: 30
       
       - name: 📈 Upload dashboard
@@ -138,7 +117,7 @@ jobs:
               owner,
               repo,
               commit_sha: sha,
-              body: `❌ **Tests failed on this commit**\n\nView the [test results](${process.env.GITHUB_SERVER_URL}/${owner}/${repo}/actions/runs/${context.runId}) for details.\n\n📊 Download the Allure report from the artifacts for detailed analysis.`
+              body: `❌ **Tests failed on this commit**\n\nView the [test results](${process.env.GITHUB_SERVER_URL}/${owner}/${repo}/actions/runs/${context.runId}) for details.\n\n📊 Download the Playwright report and test dashboard from the artifacts for detailed analysis.`
             });
 
   notify:
