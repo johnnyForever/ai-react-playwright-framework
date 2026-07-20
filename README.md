@@ -166,3 +166,7 @@ export default defineConfig([
   },
 ])
 ```
+
+## AI Disclosure
+
+This project was developed with AI assistance (GitHub Copilot). The architecture decisions, code review, and quality standards remain human-driven. AI was used as a coding assistant for implementation, refactoring, and documentation.
