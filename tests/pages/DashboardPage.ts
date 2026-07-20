@@ -3,6 +3,7 @@ import { BasePage } from './BasePage';
 
 /**
  * Dashboard Page Object Model
+ * Locator priority: getByRole → getByLabel → getByText → getByTestId → CSS
  * Following POM rules: No assertions, exposes business actions
  */
 export class DashboardPage extends BasePage {
@@ -24,20 +25,22 @@ export class DashboardPage extends BasePage {
   constructor(page: Page) {
     super(page);
 
-    // Header - using data-testid
+    // Header - using getByRole where possible (Priority 1)
+    this.headerTitle = page.getByRole('heading', { name: 'React Demo App' });
+    this.logoutButton = page.getByRole('button', { name: 'Logout' });
+    this.productsTitle = page.getByRole('heading', { name: 'Products' });
+
+    // Header elements without semantic roles - using data-testid (Priority 5)
     this.header = page.getByTestId('dashboard-header');
-    this.headerTitle = page.getByTestId('dashboard-title');
     this.userEmail = page.getByTestId('user-email');
     this.adminBadge = page.getByTestId('admin-badge');
-    this.logoutButton = page.getByTestId('logout-button');
     this.basketIcon = page.getByTestId('basket-icon');
     this.basketCount = page.getByTestId('basket-count');
 
-    // Product list - using data-testid
+    // Product list - using getByLabel for form controls, data-testid for containers
+    this.sortSelector = page.getByLabel('Sort by:');
     this.productGrid = page.getByTestId('product-grid');
     this.productCards = page.locator('[data-testid^="product-card-"]');
-    this.sortSelector = page.getByLabel('Sort by:');
-    this.productsTitle = page.getByRole('heading', { name: 'Products' });
   }
 
   /**

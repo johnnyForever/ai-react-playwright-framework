@@ -1,54 +1,80 @@
-# AI Usage Rules (Copilot / Amazon Q)
+# AI Usage Guidelines
 
 ## Code Generation Standards
 
 AI-generated code must:
 
-* Follow the project's coding standards and architecture
-* Prefer reuse over duplication
-* Include comments for assumptions
-* Avoid hacks or shortcuts
-* Optimize for clarity and maintainability
+| Requirement | Description |
+|-------------|-------------|
+| Follow standards | Match project coding standards and architecture |
+| Reuse patterns | Prefer existing patterns over new implementations |
+| Document assumptions | Include comments for non-obvious decisions |
+| Be maintainable | Optimize for clarity over cleverness |
 
 ---
 
 ## AI Tooling
 
-This project uses MCP servers to provide AI with structured access to:
+This project uses MCP (Model Context Protocol) servers to provide AI with:
 
-* Playwright APIs and best practices
-* Repository structure and file system
-* (Optional) Git history and diffs
-
----
-
-## Human-AI Collaboration
-
-* AI is used as a coding assistant, not an autonomous agent
-* All architectural decisions remain human-driven
-* AI suggestions should be reviewed before committing
-* Complex logic requires human validation
+- Playwright APIs and best practices
+- Repository structure and file system access
+- Git history and diffs (optional)
 
 ---
 
-## Prompting Guidelines
+## Human-AI Collaboration Model
+
+| Responsibility | Owner |
+|---------------|-------|
+| Architectural decisions | Human |
+| Code implementation | AI-assisted |
+| Pattern selection | Human with AI suggestions |
+| Code review | Human (required before commit) |
+| Complex logic validation | Human |
+
+---
+
+## Prompting Best Practices
 
 When working with AI assistants:
 
-1. Provide clear context about the task
-2. Reference relevant existing code patterns
-3. Specify test requirements upfront
-4. Request incremental changes over large rewrites
+1. **Provide context** — Reference relevant files and existing patterns
+2. **Be specific** — Describe expected inputs, outputs, and edge cases
+3. **Request incremental changes** — Smaller changes are easier to review
+4. **Specify test requirements** — Include testing expectations upfront
 
 ---
 
-## Quality Checklist for AI Code
+## Quality Checklist
 
-Before accepting AI-generated code, verify:
+Before accepting AI-generated code:
 
-- [ ] Follows POM pattern for page objects
-- [ ] Uses correct locator strategy
-- [ ] No hardcoded test data
+**Architecture & Patterns**
+- [ ] Follows Page Object Model for E2E tests
+- [ ] Uses correct locator strategy (see [locators.instructions.md](locators.instructions.md))
+- [ ] Matches existing code style and patterns
+
+**Code Quality**
 - [ ] Proper TypeScript types (no `any`)
-- [ ] Includes error handling
-- [ ] Matches existing code style
+- [ ] Includes error handling where appropriate
+- [ ] No hardcoded credentials or test data
+- [ ] Clear, descriptive naming
+
+**Testing**
+- [ ] Tests follow journey-based approach with `test.step()`
+- [ ] Assertions include context messages
+- [ ] Tests tagged appropriately (`@smoke`, `@regression`)
+
+---
+
+## Anti-Patterns to Reject
+
+| Anti-Pattern | Why It's Wrong |
+|--------------|----------------|
+| Using `any` type | Defeats TypeScript's purpose; use `unknown` or proper types |
+| Over-granular tests | One assertion per test wastes execution time and obscures failures |
+| Hardcoded credentials | Security risk; use environment variables |
+| New patterns without discussion | Breaks consistency; prefer existing patterns |
+| Skipping error handling | Makes debugging difficult |
+| Brittle locators | Tests break on minor UI changes |

@@ -3,6 +3,7 @@ import { BasePage } from './BasePage';
 
 /**
  * Checkout Page Object Model
+ * Locator priority: getByRole → getByLabel → getByText → getByTestId → CSS
  * Following POM rules: No assertions, exposes business actions
  */
 export class CheckoutPage extends BasePage {
@@ -20,14 +21,17 @@ export class CheckoutPage extends BasePage {
   constructor(page: Page) {
     super(page);
 
+    // Using getByRole where possible (Priority 1)
+    this.checkoutTitle = page.getByRole('heading', { name: 'Checkout' });
+    this.continueShoppingButton = page.getByRole('link', { name: 'Continue Shopping' }).first();
+    this.finishOrderButton = page.getByRole('link', { name: 'Finish Order' });
+
+    // Elements without semantic roles - using data-testid (Priority 5)
     this.checkoutPage = page.getByTestId('checkout-page');
-    this.checkoutTitle = page.getByTestId('checkout-title');
     this.checkoutEmpty = page.getByTestId('checkout-empty');
     this.checkoutSummary = page.getByTestId('checkout-summary');
     this.totalQuantity = page.getByTestId('checkout-total-quantity');
     this.totalPrice = page.getByTestId('checkout-total-price');
-    this.continueShoppingButton = page.getByTestId('continue-shopping');
-    this.finishOrderButton = page.getByTestId('finish-order');
     this.basketIcon = page.getByTestId('basket-icon');
     this.basketCount = page.getByTestId('basket-count');
   }

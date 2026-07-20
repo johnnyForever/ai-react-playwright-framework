@@ -12,6 +12,7 @@ This project includes a comprehensive testing strategy with **unit tests**, **E2
 
 ### E2E Testing (Playwright)
 - **Page Object Model (POM)** pattern for maintainable tests
+- **Journey-based test design** — related assertions grouped into meaningful user flows
 - **Custom fixtures** for page objects and logging
 - **SQLite database** for historical test tracking
 - **Custom HTML dashboard** for test analytics
@@ -23,6 +24,49 @@ This project includes a comprehensive testing strategy with **unit tests**, **E2
 - **Performance metrics** with response time tracking (p50, p95, p99)
 - **Stress tests** for burst and sustained load scenarios
 - **Custom ApiHelper** class with configurable thresholds
+
+---
+
+## Testing Philosophy
+
+### Journey-Based Tests
+
+E2E tests follow a **journey-based approach** where related assertions are grouped into meaningful user flows rather than split into many tiny tests:
+
+```typescript
+// RECOMMENDED: Journey-based test
+test('user can add and remove products from basket', async ({ dashboardPage }) => {
+  await test.step('Add first product and verify basket updates', async () => {
+    await dashboardPage.addToBasket(testProducts[0].id);
+    expect(await dashboardPage.getBasketCount()).toBe(1);
+  });
+
+  await test.step('Add second product and verify count increases', async () => {
+    await dashboardPage.addToBasket(testProducts[1].id);
+    expect(await dashboardPage.getBasketCount()).toBe(2);
+  });
+
+  await test.step('Remove product and verify basket updates', async () => {
+    await dashboardPage.removeFromBasket(testProducts[0].id);
+    expect(await dashboardPage.getBasketCount()).toBe(1);
+  });
+});
+
+// AVOID: Over-granular tests
+test('should display basket icon', ...);
+test('should show count when empty', ...);
+test('should add product', ...);
+```
+
+### When to Separate Tests
+
+Create separate tests when:
+- Testing **different user paths** (happy path vs error scenarios)
+- Testing **independent features** that don't share setup
+- A failure in one area shouldn't mask failures in another
+- Tests require **different authentication states**
+
+---
 
 ## Quick Start
 

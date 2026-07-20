@@ -3,6 +3,7 @@ import { BasePage } from './BasePage';
 
 /**
  * Product Detail Page Object Model
+ * Locator priority: getByRole → getByLabel → getByText → getByTestId → CSS
  * Following POM rules: No assertions, exposes business actions
  */
 export class ProductDetailPage extends BasePage {
@@ -18,14 +19,21 @@ export class ProductDetailPage extends BasePage {
   constructor(page: Page) {
     super(page);
 
+    // Using getByRole where possible (Priority 1)
+    this.backButton = page.getByRole('link', { name: '← Back to Products' });
+    // Note: basketButton text is dynamic ('Add to Basket' or 'Remove from Basket')
+    this.basketButton = page.getByTestId('product-detail-basket-btn');
+
+    // Product name is an h1 heading - using getByRole
+    // Note: Can't use getByRole('heading') without name as product name is dynamic
+    this.productName = page.getByTestId('product-detail-name');
+
+    // Elements without semantic roles - using data-testid (Priority 5)
     this.productDetailPage = page.getByTestId('product-detail-page');
     this.productDetail = page.getByTestId('product-detail');
-    this.productName = page.getByTestId('product-detail-name');
     this.productDescription = page.getByTestId('product-detail-description');
     this.productPrice = page.getByTestId('product-detail-price');
     this.productImage = page.getByTestId('product-detail-image');
-    this.backButton = page.getByTestId('back-to-products');
-    this.basketButton = page.getByTestId('product-detail-basket-btn');
   }
 
   /**

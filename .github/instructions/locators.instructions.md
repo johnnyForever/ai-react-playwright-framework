@@ -1,44 +1,73 @@
 # Locator Strategy
 
-## Locator Priority (Highest → Lowest)
+## Priority Order (Highest to Lowest)
 
-1. `getByRole` - Accessibility-first, most stable
-2. `data-testid` - Explicit test hooks
-3. `getByLabel` - Form elements
-4. `getByPlaceholder` - Input fields
-5. CSS selectors - When necessary
-6. XPath - **Last resort only**
+| Priority | Locator Type | Use Case |
+|----------|--------------|----------|
+| 1 | `getByRole` | Accessibility-first, most stable |
+| 2 | `getByLabel` | Form elements with labels |
+| 3 | `getByText` | Visible text content |
+| 4 | `getByPlaceholder` | Input fields without labels |
+| 5 | `getByTestId` | Explicit test hooks |
+| 6 | CSS selectors | When semantic locators unavailable |
+| 7 | XPath | Last resort only (requires justification) |
 
 ---
 
-## Rules
+## Best Practices
 
-* XPath requires a justification comment explaining why other locators won't work
-* Avoid brittle selectors (indexes, dynamic classes)
-* Prefer accessibility-first locators
+- **Accessibility-first**: Prefer role-based locators that reflect how users interact with the page
+- **Avoid brittle selectors**: No indexes, generated classes, or deeply nested paths
+- **Use data-testid sparingly**: Only when semantic locators are insufficient
+- **Document XPath usage**: Any XPath requires a comment explaining why other locators won't work
 
 ---
 
 ## Examples
 
 ```typescript
-// ✅ Good - accessibility-first
+// RECOMMENDED - Accessibility-first (Priority 1)
 page.getByRole('button', { name: 'Submit' });
 page.getByRole('textbox', { name: 'Email' });
+page.getByRole('heading', { name: 'Dashboard' });
+page.getByRole('link', { name: 'Products' });
 
-// ✅ Good - explicit test hook
-page.getByTestId('product-card');
-
-// ✅ Good - form label
+// RECOMMENDED - Form labels (Priority 2)
 page.getByLabel('Password');
+page.getByLabel('Remember me');
 
-// ⚠️ Acceptable - when role/label not available
+// RECOMMENDED - Visible text (Priority 3)
+page.getByText('Welcome back');
+page.getByText('Add to Basket');
+
+// ACCEPTABLE - Explicit test hooks (Priority 5)
+page.getByTestId('product-card');
+page.getByTestId('basket-count');
+
+// ACCEPTABLE - CSS when semantic locators unavailable (Priority 6)
 page.locator('.product-list > .item');
+page.locator('[data-product-id="123"]');
 
-// ❌ Avoid - brittle selectors
+// AVOID - Brittle selectors
 page.locator('div:nth-child(3) > span');
 page.locator('.btn-primary-v2-active');
+page.locator('#root > div > main > section:first-child');
 
-// ❌ Avoid - XPath without justification
+// AVOID - XPath without justification
 page.locator('//div[@class="container"]/button');
+
+// ACCEPTABLE - XPath with justification (Priority 7)
+// XPath required: Need to select parent element based on child text content
+page.locator('//tr[td[contains(text(), "Product Name")]]');
 ```
+
+---
+
+## Locator Stability Checklist
+
+Before committing locators, verify:
+
+- [ ] Locator uses semantic meaning (role, label, text)
+- [ ] Locator survives minor UI changes
+- [ ] Locator is not dependent on DOM structure
+- [ ] Locator has fallback if using dynamic attributes

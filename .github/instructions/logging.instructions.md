@@ -1,61 +1,96 @@
-# Logging & Debugging (Mandatory)
+# Logging & Debugging
 
-## What Is Logged
+## What Gets Logged
 
-* High-level UI actions
-* Test start / end
-* Errors with stack traces
-* Screenshots on UI failures
-* Trace enabled on first retry
-
----
-
-## Rules
-
-* No secrets in logs
-* One log file per execution
+| Event Type | Details |
+|------------|---------|
+| Test lifecycle | Test start, end, duration |
+| UI actions | High-level actions (click, fill, navigate) |
+| Errors | Full stack traces with context |
+| Failures | Screenshots captured automatically |
+| Retries | Trace enabled on first retry |
 
 ---
 
-## Assertions & Error Handling
+## Logging Rules
 
-### Assertion Guidelines
-
-* Use Playwright `expect`
-* One logical assertion per check
-* Descriptive assertion messages
-
-### On Failure
-
-* Screenshot captured
-* Trace available
+- **No secrets**: Never log passwords, tokens, or sensitive data
+- **One log file per execution**: Centralized output for debugging
+- **Structured format**: Timestamp, level, and message
 
 ---
 
-## Example Logging
+## Logger Implementation
 
 ```typescript
 // tests/utils/logger.ts
+const timestamp = () => new Date().toISOString();
+
 export const logger = {
-  info: (message: string) => console.log(`[INFO] ${timestamp()} ${message}`),
+  info: (message: string) => 
+    console.log(`[INFO] ${timestamp()} ${message}`),
+  
   error: (message: string, error?: Error) => {
     console.error(`[ERROR] ${timestamp()} ${message}`);
     if (error?.stack) console.error(error.stack);
   },
-  action: (action: string) => console.log(`[ACTION] ${timestamp()} ${action}`)
+  
+  action: (action: string) => 
+    console.log(`[ACTION] ${timestamp()} ${action}`),
+  
+  step: (step: string) => 
+    console.log(`[STEP] ${timestamp()} ${step}`)
 };
 ```
 
 ---
 
-## Example Assertion
+## Assertion Best Practices
+
+Use descriptive messages to provide context on failure:
 
 ```typescript
-// ✅ Good - descriptive message
+// RECOMMENDED - Descriptive assertion messages
 await expect(page.getByRole('heading')).toHaveText('Dashboard', {
-  message: 'Dashboard heading should be visible after login'
+  message: 'Dashboard heading should be visible after successful login'
 });
 
-// ❌ Avoid - no context on failure
+await expect(basketCount).toHaveText('3', {
+  message: 'Basket should show 3 items after adding products'
+});
+
+// ACCEPTABLE - Self-documenting assertions
+await expect(dashboardPage.headerTitle).toBeVisible();
+await expect(loginPage.errorMessage).toContainText('Invalid');
+
+// AVOID - No context on failure
 await expect(heading).toBeVisible();
+await expect(count).toBe(3);
+```
+
+---
+
+## Failure Artifacts
+
+On test failure, Playwright automatically captures:
+
+| Artifact | Location |
+|----------|----------|
+| Screenshots | `test-results/` |
+| Traces | `test-results/` (on retry) |
+| Videos | `test-results/` (if enabled) |
+
+---
+
+## Debug Configuration
+
+```typescript
+// playwright.config.ts
+export default defineConfig({
+  use: {
+    screenshot: 'only-on-failure',
+    trace: 'on-first-retry',
+    video: 'retain-on-failure',
+  },
+});
 ```

@@ -315,13 +315,6 @@ test-results/
 
 ## Maintenance
 
-### Clearing Old Data
-
-```typescript
-// Clear runs older than 30 days
-db.clearOldRuns(30);
-```
-
 ### Resetting Database
 
 ```bash

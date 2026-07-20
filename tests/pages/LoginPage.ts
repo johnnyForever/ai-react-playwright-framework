@@ -3,10 +3,11 @@ import { BasePage } from './BasePage';
 
 /**
  * Login Page Object Model
+ * Locator priority: getByRole → getByLabel → getByText → getByTestId → CSS
  * Following POM rules: No assertions, exposes business actions
  */
 export class LoginPage extends BasePage {
-  // Locators - using data-testid first, then accessibility approach
+  // Form element locators - accessibility-first approach
   readonly loginForm: Locator;
   readonly emailInput: Locator;
   readonly passwordInput: Locator;
@@ -24,26 +25,30 @@ export class LoginPage extends BasePage {
   constructor(page: Page) {
     super(page);
 
-    // Form elements - using data-testid
-    this.loginForm = page.getByTestId('login-form');
-    this.emailInput = page.getByTestId('email-input');
-    this.passwordInput = page.getByTestId('password-input');
-    this.rememberMeCheckbox = page.getByTestId('remember-me-checkbox');
-    this.submitButton = page.getByTestId('login-submit');
-    this.forgotPasswordLink = page.getByTestId('forgot-password-link');
+    // Form elements - using getByLabel (Priority 2) for labeled inputs
+    this.emailInput = page.getByLabel('Email');
+    this.passwordInput = page.getByLabel('Password');
+    this.rememberMeCheckbox = page.getByLabel('Remember me');
 
-    // Navigation elements - using data-testid
-    this.navigation = page.getByTestId('navigation');
-    this.loginNavLink = page.getByTestId('nav-login');
-    this.adminNavLink = page.getByTestId('nav-admin');
+    // Buttons/links - using getByRole (Priority 1)
+    this.submitButton = page.getByRole('button', { name: 'Login' });
+    this.forgotPasswordLink = page.getByRole('link', { name: 'Forgot Password?' });
 
-    // Error messages - using data-testid
+    // Page title - using getByRole (Priority 1)
+    this.pageTitle = page.getByRole('heading', { name: 'Login' });
+
+    // Error messages - using getByRole('alert') with data-testid fallback for specificity
     this.errorMessage = page.getByTestId('login-error');
     this.emailError = page.getByTestId('email-error');
     this.passwordError = page.getByTestId('password-error');
 
-    // Page elements - using data-testid
-    this.pageTitle = page.getByTestId('login-title');
+    // Form container - using data-testid (no semantic alternative)
+    this.loginForm = page.getByTestId('login-form');
+
+    // Navigation elements - using data-testid (structure-specific)
+    this.navigation = page.getByTestId('navigation');
+    this.loginNavLink = page.getByTestId('nav-login');
+    this.adminNavLink = page.getByTestId('nav-admin');
   }
 
   /**

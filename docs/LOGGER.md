@@ -24,9 +24,9 @@ import { TestLogger } from '../utils/logger';
 Or use it via the custom fixture:
 
 ```typescript
-import { test } from '../fixtures/base.fixture';
+import { test } from '@tests/fixtures/auth.fixture';
 
-test('example test', async ({ page, logger }) => {
+test('example test', async ({ loginPage, logger }) => {
   logger.info('Starting test');
   // ... test code
 });
@@ -165,14 +165,16 @@ Console output is color-coded and formatted:
 The logger is automatically available in tests via fixtures:
 
 ```typescript
-// tests/fixtures/base.fixture.ts
+// tests/fixtures/auth.fixture.ts
 import { test as base } from '@playwright/test';
-import { TestLogger } from '../utils/logger';
+import { createLogger, type TestLogger } from '@tests/utils/logger';
+import { v4 as uuidv4 } from 'uuid';
+
+const RUN_ID = process.env.TEST_RUN_ID || uuidv4();
 
 export const test = base.extend<{ logger: TestLogger }>({
-  logger: async ({ }, use, testInfo) => {
-    const runId = process.env.RUN_ID || 'local';
-    const logger = new TestLogger(runId, testInfo);
+  logger: async ({}, use, testInfo) => {
+    const logger = createLogger(RUN_ID, testInfo);
     logger.testStart();
     
     await use(logger);
@@ -206,28 +208,25 @@ const dbEntries = logger.getDbEntries();
 ## Example Test
 
 ```typescript
-import { test, expect } from '../fixtures/base.fixture';
+import { test, expect } from '@tests/fixtures/auth.fixture';
 
-test('complete checkout flow', async ({ page, logger }) => {
+test('complete checkout flow', async ({ dashboardPage, checkoutPage, logger }) => {
   await logger.step('Add item to cart', async () => {
-    await page.click('[data-testid="add-to-cart"]');
-    logger.info('Item added', { productId: 'ABC123' });
+    await dashboardPage.addToBasket('product-1');
+    logger.info('Item added', { productId: 'product-1' });
   });
 
   await logger.step('Proceed to checkout', async () => {
-    await page.click('[data-testid="checkout-button"]');
-    await expect(page).toHaveURL(/checkout/);
+    await dashboardPage.basketIcon.click();
+    await expect(checkoutPage.checkoutTitle).toBeVisible();
   });
 
-  await logger.step('Complete payment', async () => {
-    await page.fill('#card-number', '4111111111111111');
-    await page.click('#submit-payment');
-    
+  await logger.step('Verify order summary', async () => {
     try {
-      await expect(page.locator('.success')).toBeVisible();
-      logger.info('Payment successful');
+      await expect(checkoutPage.orderSummary).toBeVisible();
+      logger.info('Checkout ready');
     } catch (error) {
-      logger.error('Payment failed', error as Error);
+      logger.error('Checkout failed', error as Error);
       throw error;
     }
   });

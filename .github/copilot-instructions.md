@@ -4,18 +4,18 @@
 
 This document defines **clear, opinionated, and practical rules** for building a **React application with Playwright test automation**.
 
-Intended audience:
+**Audience:**
 
-* **AI coding tools** (GitHub Copilot, Amazon Q)
-* **Human reviewers** (recruiters, engineers)
+- **AI coding tools** (GitHub Copilot, Amazon Q)
+- **Human reviewers** (recruiters, engineers)
 
-> ⚠️ This is the **target architecture**, implemented **incrementally**.
+> This is the **target architecture**, implemented **incrementally**.
 
 ---
 
 ## Detailed Instructions
 
-Detailed rules are split into topic-specific files in `.github/instructions/`:
+Topic-specific rules are in `.github/instructions/`:
 
 | Topic | File |
 |-------|------|
@@ -33,29 +33,29 @@ Detailed rules are split into topic-specific files in `.github/instructions/`:
 
 ---
 
-## General Principles
+## Core Principles
 
 ### Code Quality
 
-* No `any` in TypeScript
-* Prefer reuse over duplication
-* Optimize for clarity and maintainability
+- No `any` in TypeScript—use proper types or `unknown`
+- Prefer reuse over duplication
+- Optimize for clarity and maintainability
 
-### Testing
+### Testing Philosophy
 
-* Page Object Model (POM) is mandatory
-* Tests must be isolated with no shared state
-* Accessibility-first locators (`getByRole` > `data-testid` > CSS)
+- **Page Object Model (POM)** is mandatory
+- **Journey-based tests**: Group related assertions into meaningful user flows rather than splitting into many tiny tests
+- **Test isolation**: No shared state between tests, but multiple assertions within a test are encouraged when they validate a single user journey
+- **Accessibility-first locators**: `getByRole` → `getByLabel` → `getByTestId` → CSS (see [locators.instructions.md](instructions/locators.instructions.md) for full priority)
 
 ### AI Collaboration
 
-* AI is a coding assistant, not autonomous agent
-* All architectural decisions remain human-driven
-* Follow project standards and existing patterns
+- AI is a coding assistant, not an autonomous agent
+- All architectural decisions remain human-driven
+- Follow project standards and existing patterns
 
 ---
 
 ## Status
 
-This project is intentionally **iterative**.
-Rules are implemented progressively to demonstrate real-world engineering tradeoffs and growth.
+This project is intentionally **iterative**. Rules are implemented progressively to demonstrate real-world engineering tradeoffs and growth.

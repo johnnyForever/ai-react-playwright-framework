@@ -1,29 +1,32 @@
 # Reports & CI/CD
 
-## Reports & Artifacts
+## Test Reports
 
-* HTML report generated per run
-* Reports are not committed
-* Stored per execution
-* JUnit XML for CI integration (published to GitHub Actions UI via `dorny/test-reporter`)
-* Custom HTML dashboard for analytics
-* API performance reports with metrics
+| Report Type | Purpose | Format |
+|-------------|---------|--------|
+| HTML Report | Visual test results | `playwright-report/` |
+| JUnit XML | CI/CD integration | `test-results/junit.xml` |
+| Custom Dashboard | Analytics and trends | `test-results/dashboard/` |
+| Performance Report | API metrics | `test-results/performance.json` |
 
----
-
-## CI/CD Pipeline Steps
-
-1. Install dependencies
-2. Run static analysis
-3. Execute tests (unit, API, E2E)
-4. Publish JUnit results to GitHub Actions UI
-5. Generate test dashboard
-6. Upload artifacts (reports, screenshots)
-7. Archive logs
+**Note**: Reports are generated per execution and not committed to the repository.
 
 ---
 
-## GitHub Actions Example
+## CI/CD Pipeline
+
+### Pipeline Stages
+
+1. **Install** — Install dependencies with `npm ci`
+2. **Lint** — Run static analysis (Biome)
+3. **Unit Tests** — Run Vitest unit tests
+4. **API Tests** — Run Playwright API tests
+5. **E2E Tests** — Run Playwright E2E tests
+6. **Report** — Publish results and upload artifacts
+
+---
+
+## GitHub Actions Workflow
 
 ```yaml
 name: Test Suite
@@ -33,6 +36,7 @@ on: [push, pull_request]
 jobs:
   test:
     runs-on: ubuntu-latest
+    
     steps:
       - uses: actions/checkout@v4
       
@@ -44,6 +48,9 @@ jobs:
       
       - name: Install dependencies
         run: npm ci
+      
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps
       
       - name: Run linting
         run: npm run lint
@@ -62,7 +69,7 @@ jobs:
           path: test-results/junit.xml
           reporter: java-junit
       
-      - name: Upload artifacts
+      - name: Upload test artifacts
         uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -70,4 +77,32 @@ jobs:
           path: |
             playwright-report/
             test-results/
+          retention-days: 30
 ```
+
+---
+
+## Test Scripts
+
+```json
+{
+  "scripts": {
+    "test:unit": "vitest run",
+    "test:e2e": "playwright test",
+    "test:api": "playwright test --project=api",
+    "test:smoke": "playwright test --grep @smoke",
+    "report": "playwright show-report"
+  }
+}
+```
+
+---
+
+## Artifact Retention
+
+| Artifact Type | Retention |
+|--------------|-----------|
+| HTML Reports | 30 days |
+| Screenshots | 30 days |
+| Traces | 7 days |
+| JUnit XML | Until pipeline cleanup |

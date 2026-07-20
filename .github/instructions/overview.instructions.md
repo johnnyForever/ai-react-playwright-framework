@@ -2,55 +2,45 @@
 
 ## Purpose
 
-This document defines **clear, opinionated, and practical rules** for building a **React application with Playwright test automation**, designed for **GitHub repository**.
+This project is a **portfolio demonstration** of production-grade React application development with comprehensive Playwright test automation.
 
-It is intentionally written to be consumed by:
+**Goals:**
 
-* **AI coding tools** (GitHub Copilot, Amazon Q)
-* **Human reviewers** (recruiters, engineers)
+- Demonstrate sound architectural thinking
+- Showcase real-world test automation practices
+- Maintain clean, maintainable TypeScript code
 
-The goal is to demonstrate:
-
-* Sound architectural thinking
-* Real-world test automation practices
-* Clean, maintainable TypeScript code
-
-> ⚠️ Not all rules are implemented at once. This document represents the **target architecture**, implemented **incrementally**.
+> This document represents the **target architecture**, implemented **incrementally**.
 
 ---
 
-## Scope & Implementation Strategy
+## Implementation Strategy
 
-### Mandatory (MVP)
+### Phase 1: Foundation (MVP)
 
-These rules are **implemented from the start**:
+- React + TypeScript setup with Vite
+- Feature-based frontend structure
+- Playwright with Page Object Model
+- Stable locator strategy (accessibility-first)
+- Basic logging & HTML reporting
 
-* React + TypeScript setup
-* Feature-based frontend structure
-* Playwright with Page Object Model
-* Stable locator strategy
-* Basic logging & reporting
+### Phase 2: Advanced Features
 
-### Advanced (Incremental)
-
-Added progressively to show evolution:
-
-* Storage state authentication
-* Network & performance monitoring
-* Database backed test results
-* CI/CD reporting
+- Storage state authentication
+- Network & performance monitoring
+- Database-backed test results
+- CI/CD pipeline with GitHub Actions
 
 ---
 
 ## Documentation
 
-* README.md with setup & execution steps
-* docs/ folder for design decisions
-* Test strategy explained
+- `README.md` — Setup and execution steps
+- `docs/` — Design decisions and technical documentation
+- Test strategy documented inline and in specs
 
 ---
 
-## Status
+## Current Phase
 
-This project is intentionally **iterative**.
-Rules are implemented progressively to demonstrate real-world engineering tradeoffs and growth.
+This project follows an iterative approach. See Phase 1 and Phase 2 above for implementation milestones.

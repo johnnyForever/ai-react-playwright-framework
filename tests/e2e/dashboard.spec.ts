@@ -13,323 +13,224 @@ import {
 /**
  * Dashboard Tests
  *
- * Most tests use storageState (pre-authenticated via auth.setup.ts)
- * Tests that need unauthenticated state use: test.use({ storageState: { cookies: [], origins: [] } })
- * Admin tests still use manual login (different credentials than storageState)
+ * Tests follow journey-based approach: related assertions grouped into meaningful user flows
+ * Uses storageState for authentication (pre-authenticated via auth.setup.ts)
  */
 
-test.describe('Dashboard - Protected Route (Unauthenticated)', () => {
-  // These tests need to start logged OUT
+test.describe('Dashboard - Access Control', () => {
   test.use({ storageState: { cookies: [], origins: [] } });
 
   test(
-    'should redirect unauthenticated user to login page',
+    'unauthenticated users are redirected to login',
     { tag: ['@smoke', '@regression'] },
-    async ({ dashboardPage }) => {
-      await test.step('Navigate to dashboard without login', async () => {
+    async ({ dashboardPage, page }) => {
+      await test.step('Access dashboard without authentication', async () => {
         await dashboardPage.navigate();
-      });
-
-      await test.step('Verify redirect to login', async () => {
         await expect(dashboardPage.page).toHaveURL(/\/login/, { timeout: 10000 });
       });
-    },
-  );
 
-  test(
-    'should redirect to login if accessing detail page while not authenticated',
-    { tag: ['@regression'] },
-    async ({ page }) => {
-      await page.goto('/dashboard/product/1');
-      await expect(page).toHaveURL(/\/login/, { timeout: 10000 });
+      await test.step('Access product detail without authentication', async () => {
+        await page.goto('/dashboard/product/1');
+        await expect(page).toHaveURL(/\/login/, { timeout: 10000 });
+      });
     },
   );
 });
 
 test.describe('Dashboard - Authenticated User', () => {
-  // Using storageState - already logged in as standard user
-
   test.beforeEach(async ({ dashboardPage }) => {
-    // Just navigate - already authenticated via storageState
     await dashboardPage.navigate();
   });
 
   test(
-    'should display dashboard after successful login',
+    'dashboard displays correctly with user information',
     { tag: ['@smoke', '@regression'] },
     async ({ dashboardPage }) => {
-      await test.step('Verify dashboard is displayed', async () => {
+      await test.step('Verify dashboard URL and main elements', async () => {
         await expect(dashboardPage.page).toHaveURL(routes.dashboard);
         await expect(dashboardPage.headerTitle).toBeVisible();
         await expect(dashboardPage.headerTitle).toHaveText('React Demo App');
       });
-    },
-  );
 
-  test(
-    'should redirect to login after logout',
-    { tag: ['@regression'] },
-    async ({ dashboardPage }) => {
-      await test.step('Logout and verify redirect', async () => {
-        await dashboardPage.logout();
-        await expect(dashboardPage.page).toHaveURL(/\/login/);
+      await test.step('Verify user email is displayed in header', async () => {
+        await expect(dashboardPage.userEmail).toBeVisible();
+        expect(await dashboardPage.getUserEmail()).toBe(validUser.email);
+      });
+
+      await test.step('Verify standard user does not see admin badge', async () => {
+        await expect(dashboardPage.adminBadge).not.toBeVisible();
+      });
+
+      await test.step('Verify logout button is available', async () => {
+        await expect(dashboardPage.logoutButton).toBeVisible();
       });
     },
   );
-});
-
-test.describe('Dashboard - Header', () => {
-  // Using storageState - already logged in as standard user
-
-  test.beforeEach(async ({ dashboardPage }) => {
-    await dashboardPage.navigate();
-  });
 
   test(
-    'should display React Demo App title in header',
+    'logout redirects user to login page',
     { tag: ['@regression'] },
     async ({ dashboardPage }) => {
-      await expect(dashboardPage.headerTitle).toBeVisible();
-      await expect(dashboardPage.headerTitle).toHaveText('React Demo App');
+      await dashboardPage.logout();
+      await expect(dashboardPage.page).toHaveURL(/\/login/);
     },
   );
-
-  test(
-    'should display user email in header',
-    { tag: ['@regression'] },
-    async ({ dashboardPage }) => {
-      await expect(dashboardPage.userEmail).toBeVisible();
-      const userEmail = await dashboardPage.getUserEmail();
-      expect(userEmail).toBe(validUser.email);
-    },
-  );
-
-  test(
-    'should NOT display admin badge for regular user',
-    { tag: ['@regression'] },
-    async ({ dashboardPage }) => {
-      await expect(dashboardPage.adminBadge).not.toBeVisible();
-    },
-  );
-
-  test('should display logout button', { tag: ['@regression'] }, async ({ dashboardPage }) => {
-    await expect(dashboardPage.logoutButton).toBeVisible();
-  });
 });
 
 test.describe('Dashboard - Admin User', () => {
-  // Admin needs different credentials - use manual login
   test.use({ storageState: { cookies: [], origins: [] } });
 
-  test.beforeEach(async ({ loginPage }) => {
-    await loginPage.navigate();
-    await loginPage.login(validAdmin.email, validAdmin.password);
-  });
-
   test(
-    'should display admin badge for admin user',
+    'admin user sees admin badge and correct information',
     { tag: ['@regression'] },
-    async ({ dashboardPage }) => {
-      await expect(dashboardPage.adminBadge).toBeVisible();
-      await expect(dashboardPage.adminBadge).toHaveText('Admin');
-    },
-  );
+    async ({ loginPage, dashboardPage }) => {
+      await test.step('Login as admin', async () => {
+        await loginPage.navigate();
+        await loginPage.login(validAdmin.email, validAdmin.password);
+      });
 
-  test(
-    'should display admin email in header',
-    { tag: ['@regression'] },
-    async ({ dashboardPage }) => {
-      await expect(dashboardPage.userEmail).toBeVisible();
-      const userEmail = await dashboardPage.getUserEmail();
-      expect(userEmail).toBe(validAdmin.email);
+      await test.step('Verify admin badge is displayed', async () => {
+        await expect(dashboardPage.adminBadge).toBeVisible();
+        await expect(dashboardPage.adminBadge).toHaveText('Admin');
+      });
+
+      await test.step('Verify admin email is displayed', async () => {
+        await expect(dashboardPage.userEmail).toBeVisible();
+        expect(await dashboardPage.getUserEmail()).toBe(validAdmin.email);
+      });
     },
   );
 });
 
 test.describe('Dashboard - Product List', () => {
-  // Using storageState - already logged in as standard user
-
   test.beforeEach(async ({ dashboardPage }) => {
     await dashboardPage.navigate();
   });
 
   test(
-    'should display 4 products',
+    'product grid displays all products with correct information',
     { tag: ['@smoke', '@regression'] },
     async ({ dashboardPage }) => {
-      await expect(dashboardPage.productGrid).toBeVisible();
-      const count = await dashboardPage.getProductCount();
-      expect(count).toBe(4);
+      await test.step('Verify Products heading and grid are visible', async () => {
+        await expect(dashboardPage.productsTitle).toBeVisible();
+        await expect(dashboardPage.productGrid).toBeVisible();
+      });
+
+      await test.step('Verify correct number of products displayed', async () => {
+        expect(await dashboardPage.getProductCount()).toBe(4);
+      });
+
+      await test.step('Verify all product names are visible', async () => {
+        for (const product of testProducts) {
+          await expect(dashboardPage.page.getByTestId(`product-link-${product.id}`)).toBeVisible();
+        }
+      });
+
+      await test.step('Verify all product prices are displayed correctly', async () => {
+        for (const product of testProducts) {
+          const price = await dashboardPage.getProductPrice(product.id);
+          expect(price).toContain(product.price.toString());
+        }
+      });
     },
   );
 
-  test('should display all product names', { tag: ['@regression'] }, async ({ dashboardPage }) => {
-    for (const product of testProducts) {
-      await expect(dashboardPage.page.getByTestId(`product-link-${product.id}`)).toBeVisible();
-    }
-  });
-
-  test('should display all product prices', { tag: ['@regression'] }, async ({ dashboardPage }) => {
-    for (const product of testProducts) {
-      const price = await dashboardPage.getProductPrice(product.id);
-      expect(price).toContain(product.price.toString());
-    }
-  });
-
-  test('should display Products heading', { tag: ['@regression'] }, async ({ dashboardPage }) => {
-    await expect(dashboardPage.productsTitle).toBeVisible();
-  });
-});
-
-test.describe('Dashboard - Sorting', () => {
-  // Using storageState - already logged in as standard user
-
-  test.beforeEach(async ({ dashboardPage }) => {
-    await dashboardPage.navigate();
-  });
-
   test(
-    'should sort products by name A-Z',
+    'product sorting works correctly for all options',
     { tag: ['@smoke', '@regression'] },
     async ({ dashboardPage }) => {
-      await test.step('Select sort by name A-Z', async () => {
+      await test.step('Sort by name A-Z', async () => {
         await dashboardPage.selectSortOption('name-asc');
+        expect(await dashboardPage.getProductNames()).toEqual(sortedByNameAsc);
       });
 
-      await test.step('Verify products are sorted correctly', async () => {
-        const names = await dashboardPage.getProductNames();
-        expect(names).toEqual(sortedByNameAsc);
+      await test.step('Sort by name Z-A', async () => {
+        await dashboardPage.selectSortOption('name-desc');
+        expect(await dashboardPage.getProductNames()).toEqual(sortedByNameDesc);
       });
-    },
-  );
 
-  test('should sort products by name Z-A', { tag: ['@regression'] }, async ({ dashboardPage }) => {
-    await dashboardPage.selectSortOption('name-desc');
-    const names = await dashboardPage.getProductNames();
-    expect(names).toEqual(sortedByNameDesc);
-  });
+      await test.step('Sort by price low to high', async () => {
+        await dashboardPage.selectSortOption('price-asc');
+        expect(await dashboardPage.getProductNames()).toEqual(sortedByPriceAsc);
+      });
 
-  test(
-    'should sort products by price low to high',
-    { tag: ['@regression'] },
-    async ({ dashboardPage }) => {
-      await dashboardPage.selectSortOption('price-asc');
-      const names = await dashboardPage.getProductNames();
-      expect(names).toEqual(sortedByPriceAsc);
-    },
-  );
-
-  test(
-    'should sort products by price high to low',
-    { tag: ['@regression'] },
-    async ({ dashboardPage }) => {
-      await dashboardPage.selectSortOption('price-desc');
-      const names = await dashboardPage.getProductNames();
-      expect(names).toEqual(sortedByPriceDesc);
+      await test.step('Sort by price high to low', async () => {
+        await dashboardPage.selectSortOption('price-desc');
+        expect(await dashboardPage.getProductNames()).toEqual(sortedByPriceDesc);
+      });
     },
   );
 });
 
 test.describe('Dashboard - Product Navigation', () => {
-  // Using storageState - already logged in as standard user
-
   test.beforeEach(async ({ dashboardPage }) => {
     await dashboardPage.navigate();
   });
 
   test(
-    'should navigate to product detail when clicking product name',
+    'user can navigate to product detail via multiple methods',
     { tag: ['@smoke', '@regression'] },
     async ({ dashboardPage, productDetailPage }) => {
-      await test.step('Click on product name', async () => {
+      await test.step('Navigate via product name link', async () => {
         await dashboardPage.clickProduct(testProducts[0].name);
-      });
-
-      await test.step('Verify navigation to product detail', async () => {
         await expect(productDetailPage.page).toHaveURL(routes.productDetail(testProducts[0].id));
+        await productDetailPage.clickBackToProducts();
       });
-    },
-  );
 
-  test(
-    'should navigate to product detail using product link',
-    { tag: ['@regression'] },
-    async ({ dashboardPage, productDetailPage }) => {
-      await dashboardPage.clickProductById(testProducts[1].id);
-      await expect(productDetailPage.page).toHaveURL(routes.productDetail(testProducts[1].id));
-    },
-  );
+      await test.step('Navigate via product ID link', async () => {
+        await dashboardPage.clickProductById(testProducts[1].id);
+        await expect(productDetailPage.page).toHaveURL(routes.productDetail(testProducts[1].id));
+        await productDetailPage.clickBackToProducts();
+      });
 
-  test(
-    'should navigate to product detail when clicking product image',
-    { tag: ['@regression'] },
-    async ({ dashboardPage, productDetailPage }) => {
-      await dashboardPage.clickProductImage(testProducts[2].id);
-      await expect(productDetailPage.page).toHaveURL(routes.productDetail(testProducts[2].id));
+      await test.step('Navigate via product image', async () => {
+        await dashboardPage.clickProductImage(testProducts[2].id);
+        await expect(productDetailPage.page).toHaveURL(routes.productDetail(testProducts[2].id));
+      });
     },
   );
 });
 
 test.describe('Product Detail Page', () => {
-  // Using storageState - already logged in as standard user
-
   test.beforeEach(async ({ dashboardPage }) => {
     await dashboardPage.navigate();
   });
 
   test(
-    'should display product name',
-    { tag: ['@regression'] },
+    'product detail page displays complete product information',
+    { tag: ['@smoke', '@regression'] },
     async ({ dashboardPage, productDetailPage }) => {
-      await dashboardPage.clickProduct(testProducts[0].name);
-      await expect(productDetailPage.productName).toBeVisible();
-      const name = await productDetailPage.getProductName();
-      expect(name).toBe(testProducts[0].name);
+      await test.step('Navigate to product detail', async () => {
+        await dashboardPage.clickProduct(testProducts[0].name);
+      });
+
+      await test.step('Verify product name', async () => {
+        await expect(productDetailPage.productName).toBeVisible();
+        expect(await productDetailPage.getProductName()).toBe(testProducts[0].name);
+      });
+
+      await test.step('Verify product price', async () => {
+        await expect(productDetailPage.productPrice).toBeVisible();
+        expect(await productDetailPage.getProductPrice()).toContain(testProducts[0].price.toString());
+      });
+
+      await test.step('Verify product image and description', async () => {
+        await expect(productDetailPage.productImage).toBeVisible();
+        await expect(productDetailPage.productDescription).toBeVisible();
+      });
     },
   );
 
   test(
-    'should display product price',
-    { tag: ['@regression'] },
-    async ({ dashboardPage, productDetailPage }) => {
-      await dashboardPage.clickProduct(testProducts[0].name);
-      await expect(productDetailPage.productPrice).toBeVisible();
-      const price = await productDetailPage.getProductPrice();
-      expect(price).toContain(testProducts[0].price.toString());
-    },
-  );
-
-  test(
-    'should display product image',
-    { tag: ['@regression'] },
-    async ({ dashboardPage, productDetailPage }) => {
-      await dashboardPage.clickProduct(testProducts[0].name);
-      await expect(productDetailPage.productImage).toBeVisible();
-    },
-  );
-
-  test(
-    'should display product description',
-    { tag: ['@regression'] },
-    async ({ dashboardPage, productDetailPage }) => {
-      await dashboardPage.clickProduct(testProducts[0].name);
-      await expect(productDetailPage.productDescription).toBeVisible();
-    },
-  );
-
-  test(
-    'should navigate back to product list when clicking back button',
+    'back button returns user to dashboard',
     { tag: ['@regression'] },
     async ({ dashboardPage, productDetailPage }) => {
       await test.step('Navigate to product detail', async () => {
         await dashboardPage.clickProduct(testProducts[0].name);
       });
 
-      await test.step('Click back button', async () => {
+      await test.step('Click back and verify return to dashboard', async () => {
         await productDetailPage.clickBackToProducts();
-      });
-
-      await test.step('Verify return to dashboard', async () => {
         await expect(dashboardPage.page).toHaveURL(routes.dashboard);
         await expect(dashboardPage.productGrid).toBeVisible();
       });
